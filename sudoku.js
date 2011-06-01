@@ -22,6 +22,15 @@ var sudokuSolver = {
 		return rows;
 	},
 
+	setTable: function(table) {
+		$("#sudoku tr").each(function(x, element) {
+			$("td input", $(element)).each(function(y, element) {
+				$(element).val(table[x][y]);
+			});
+		});
+		
+	},
+
 	getRow: function(table, y) {
 		// get row at height y, where 0 is the top
 		return table[y];
