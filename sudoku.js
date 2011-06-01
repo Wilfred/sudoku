@@ -1,3 +1,12 @@
+var GROUPWIDTH = 3;
+var GROUPHEIGHT = 3;
+
+// board height = borad width, since a sudoku board is square
+var BOARDSIZE = GROUPWIDTH * GROUPHEIGHT;
+
+var BLANK = "";
+
+
 var sudokuSolver = {
 	getTable: function() {
 		var rows = [];
@@ -34,9 +43,6 @@ var sudokuSolver = {
 		// returning a 1-D array
 		var group = [];
 
-		var GROUPWIDTH = 3;
-		var GROUPHEIGHT = 3;
-
 		var total = 0;
 		for (var i=x*GROUPWIDTH; i<(x+1)*GROUPWIDTH; i++) {
 			for (var j=y*GROUPHEIGHT; j<(y+1)*GROUPHEIGHT; j++) {
@@ -45,5 +51,58 @@ var sudokuSolver = {
 		}
 
 		return group;
+	},
+
+	// todo: use underscore.js grooviness to make this cleaner:
+	isRegionValid: function(region) {
+		// check that a given array contains no duplicates
+		// TODO: also check that all values are legal
+		var seenSoFar = {};
+
+		for (var i=0; i<region.length; i++) {
+			if (region[i] !== BLANK && region[i] in seenSoFar) {
+				return false;
+			} else {
+				seenSoFar[region[i]] = true;
+			}
+		}
+
+		return true;
+	},
+
+	isTableValid: function(table) {
+		// could this table be a valid solution, or part of
+		// one? We tolerate blanks
+		
+		// check rows
+		var row;
+		for (var i=0; i<BOARDSIZE; i++) {
+			row = sudokuSolver.getRow(table, i);
+			if (!sudokuSolver.isRegionValid(row)) {
+				return false;
+			}
+		}
+
+		// check columns
+		var column;
+		for (var j=0; j<BOARDSIZE; j++) {
+			column = sudokuSolver.getColumn(table, j);
+			if (!sudokuSolver.isRegionValid(column)) {
+				return false;
+			}
+		}
+
+		// check groups
+		var group;
+		for (var i=0; i<BOARDSIZE/GROUPWIDTH; i++) {
+			for (var j=0; j<BOARDSIZE/GROUPHEIGHT; j++) {
+				group = sudokuSolver.getGroup(table, i, j)
+				if (!sudokuSolver.isRegionValid(group)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }
