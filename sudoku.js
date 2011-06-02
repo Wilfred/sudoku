@@ -5,7 +5,7 @@ var GROUPHEIGHT = 3;
 var BOARDSIZE = GROUPWIDTH * GROUPHEIGHT;
 
 var BLANK = "";
-
+var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 var sudokuSolver = {
 	getTable: function() {
@@ -113,5 +113,49 @@ var sudokuSolver = {
 		}
 
 		return true;
+	},
+
+	findNextEmptySquare: function(table) {
+		// return the (x,y) of the next point which is blank
+		for (var y=0; y<BOARDSIZE; y++) {
+			for (var x=0; x<BOARDSIZE; x++) {
+				if (table[y][x] === BLANK) {
+					return [x, y];
+				}
+			}
+		}
+	},
+
+	findSolution: function(table) {
+		// todo: treat tables as immutable data
+		var nextEmptySquare = sudokuSolver.findNextEmptySquare(table);
+
+		if (nextEmptySquare) {
+			// try each of the possible values in the next empty square
+			var x = nextEmptySquare[0];
+			var y = nextEmptySquare[1];
+
+			for (var i=0; i<VALUES.length; i++) {
+				table[y][x] = VALUES[i];
+				// console.log("trying " + VALUES[i] + " in position " + [x, y]);
+
+				if (sudokuSolver.isTableValid(table)) { // valid so far
+					console.log(table[2]);
+					var solution = sudokuSolver.findSolution(table);
+					if (solution !== false) {
+						return solution;
+					}
+				} else {
+					// reset this square for the backtracking
+					table[y][x] = BLANK;
+				}
+			}
+
+			// no empty square, but no solution
+			return false
+		} else {
+			// table is full, we have a solutoin
+			return table;
+		}
 	}
 }
