@@ -23,8 +23,8 @@ var sudokuSolver = {
 	},
 
 	setTable: function(table) {
-		$("#sudoku tr").each(function(x, element) {
-			$("td input", $(element)).each(function(y, element) {
+		$("#sudoku tr").each(function(y, element) {
+			$("td input", $(element)).each(function(x, element) {
 				$(element).val(table[x][y]);
 			});
 		});
