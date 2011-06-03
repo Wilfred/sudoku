@@ -130,6 +130,8 @@ var sudokuSolver = {
 
 	findNextEmptySquare: function(table) {
 		// return the (x,y) of the next point which is blank
+		// deliberately iterating over x first as it often
+		// produces more attractive (IMHO) results
 		for (var y=0; y<BOARDSIZE; y++) {
 			for (var x=0; x<BOARDSIZE; x++) {
 				if (table[x][y] === BLANK) {
@@ -150,16 +152,15 @@ var sudokuSolver = {
 
 			for (var i=0; i<VALUES.length; i++) {
 				table[x][y] = VALUES[i];
-				// console.log("trying " + VALUES[i] + " in position " + [x, y]);
 
 				if (sudokuSolver.isTableValid(table)) { // valid so far
-					console.log(table[2]);
 					var solution = sudokuSolver.findSolution(table);
 					if (solution !== false) {
 						return solution;
 					}
 				} else {
 					// reset this square for the backtracking
+					// FIXME: this overwrites user-provided values
 					table[x][y] = BLANK;
 				}
 			}
@@ -177,7 +178,6 @@ $(document).ready(function() {
 	$('button#fill_table').click(function() {
 		var blankTable = sudokuSolver.getTable();
 		var solvedTable = sudokuSolver.findSolution(blankTable);
-		console.log(solvedTable);
 		sudokuSolver.setTable(solvedTable);
 	});
 });
