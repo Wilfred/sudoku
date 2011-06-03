@@ -159,3 +159,11 @@ var sudokuSolver = {
 		}
 	}
 }
+
+$(document).ready(function() {
+	$('button#fill_table').click(function() {
+		var blankTable = sudokuSolver.getTable();
+		var solvedTable = sudokuSolver.findSolution(blankTable);
+		sudokuSolver.setTable(solvedTable);
+	});
+});
