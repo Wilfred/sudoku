@@ -1,3 +1,15 @@
+table#sudoku {
+	border-collapse: collapse;
+	border: 3px black solid;
+}
+
+#sudoku td {
+	border: 1px black solid;
+}
+
+
 input[type=text] {
+	border: none;
 	width: 40px;
+	height: 40px;
 }
