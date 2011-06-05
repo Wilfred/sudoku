@@ -1,0 +1,8 @@
+handle invalid tables (invalid values or unsolvable) better
+port to coffeescript
+colour user provided values differently
+add borders around groups in table
+add tbody element
+support m x n sudoku
+allow puzzles to be generated of varying difficulty
+add clear button

@@ -9,17 +9,30 @@ var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 var sudokuSolver = {
 	getTable: function() {
-		var rows = [];
-		$("#sudoku tr").each(function(index, element) {
-			var row = [];
-			$("td input", $(element)).each(function(index, element) {
-				row.push($(element).val());
+		// start with a blank table
+		var table = sudokuSolver.createBlankTable();
+
+		// then write in the current values
+		$("#sudoku tr").each(function(y, element) {
+			$("td input", $(element)).each(function(x, element) {
+				table[x][y] = $(element).val();
 			});
-				
-			rows.push(row);
 		});
 
-		return rows;
+		return table;
+	},
+
+	createBlankTable: function() {
+		// create an array of BOARDSIZE x BOARDSIZE, filled with blanks
+		var columns = [];
+		for (var i=0; i<BOARDSIZE; i++) {
+			var column = [];
+			for (var j=0; j<BOARDSIZE; j++) {
+				column.push(BLANK);
+			}
+			columns.push(column);
+		}
+		return columns;
 	},
 
 	setTable: function(table) {
@@ -33,18 +46,18 @@ var sudokuSolver = {
 
 	getRow: function(table, y) {
 		// get row at height y, where 0 is the top
-		return table[y];
+		var row = [];
+
+		$.each(table, function(index, column) {
+			row.push(column[y]);
+		});
+
+		return row;
 	},
 
 	getColumn: function(table, x) {
 		// get column which is x across, where 0 is leftmost
-		var column = [];
-
-		$.each(table, function(index, row) {
-			column.push(row[x]);
-		});
-
-		return column;
+		return table[x];
 	},
 
 	getGroup: function(table, x, y) {
@@ -55,7 +68,7 @@ var sudokuSolver = {
 		var total = 0;
 		for (var i=x*GROUPWIDTH; i<(x+1)*GROUPWIDTH; i++) {
 			for (var j=y*GROUPHEIGHT; j<(y+1)*GROUPHEIGHT; j++) {
-				group.push(table[j][i]);
+				group.push(table[i][j]);
 			}
 		}
 
@@ -117,9 +130,11 @@ var sudokuSolver = {
 
 	findNextEmptySquare: function(table) {
 		// return the (x,y) of the next point which is blank
+		// deliberately iterating over x first as it often
+		// produces more attractive (IMHO) results
 		for (var y=0; y<BOARDSIZE; y++) {
 			for (var x=0; x<BOARDSIZE; x++) {
-				if (table[y][x] === BLANK) {
+				if (table[x][y] === BLANK) {
 					return [x, y];
 				}
 			}
@@ -136,18 +151,17 @@ var sudokuSolver = {
 			var y = nextEmptySquare[1];
 
 			for (var i=0; i<VALUES.length; i++) {
-				table[y][x] = VALUES[i];
-				// console.log("trying " + VALUES[i] + " in position " + [x, y]);
+				table[x][y] = VALUES[i];
 
 				if (sudokuSolver.isTableValid(table)) { // valid so far
-					console.log(table[2]);
 					var solution = sudokuSolver.findSolution(table);
 					if (solution !== false) {
 						return solution;
 					}
 				} else {
 					// reset this square for the backtracking
-					table[y][x] = BLANK;
+					// FIXME: this overwrites user-provided values
+					table[x][y] = BLANK;
 				}
 			}
 
@@ -159,3 +173,11 @@ var sudokuSolver = {
 		}
 	}
 }
+
+$(document).ready(function() {
+	$('button#fill_table').click(function() {
+		var blankTable = sudokuSolver.getTable();
+		var solvedTable = sudokuSolver.findSolution(blankTable);
+		sudokuSolver.setTable(solvedTable);
+	});
+});
