@@ -8,7 +8,15 @@ var BLANK = "";
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 var sudokuSolver = {
-	getTable: function() {
+	clearTable: function() {
+		// set the table in the DOM to be blank
+		sudokuSolver.removeUserValuesClass();
+		
+		var blankTable = sudokuSolver.createBlankTable();
+		sudokuSolver.setTable(blankTable);
+	},
+	
+	getTableFromDom: function() {
 		// start with a blank table
 		var table = sudokuSolver.createBlankTable();
 
@@ -18,6 +26,25 @@ var sudokuSolver = {
 				table[x][y] = $(element).val();
 			});
 		});
+
+		return table;
+	},
+
+	getTableFromString: function(string) {
+		// given a string of characters specifying the table,
+		// return a table populated with those values
+
+		// example string: ".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."
+		var table = sudokuSolver.createBlankTable();
+
+		var value;
+		for (var i=0; i<string.length; i++) {
+			value = string.charAt(i);
+
+			if (value in VALUES) {
+				table[Math.floor(i / BOARDSIZE)][i % BOARDSIZE] = value;
+			}
+		}
 
 		return table;
 	},
@@ -40,8 +67,6 @@ var sudokuSolver = {
 		// we can style them differently
 		$("#sudoku td input").each(function(index, element) {
 			var $input = $(element);
-
-			console.log($input.val());
 
 			if ($input.val() !== BLANK) {
 				$input.parent().addClass("user_value");
@@ -200,15 +225,21 @@ $(document).ready(function() {
 	$('button#fill_table').click(function() {
 		sudokuSolver.addUserValuesClass();
 		
-		var currentTable = sudokuSolver.getTable();
+		var currentTable = sudokuSolver.getTableFromDom();
 		var solvedTable = sudokuSolver.findSolution(currentTable);
 		sudokuSolver.setTable(solvedTable);
 	});
 
 	$('button#clear_table').click(function() {
-		sudokuSolver.removeUserValuesClass();
-		
-		var blankTable = sudokuSolver.createBlankTable();
-		sudokuSolver.setTable(blankTable);
+		sudokuSolver.clearTable();
 	});
+
+	$('button#import_puzzle').click(function() {
+		sudokuSolver.clearTable();
+
+		var puzzleString = prompt("Enter a puzzle string:");
+		var table = sudokuSolver.getTableFromString(puzzleString);
+		sudokuSolver.setTable(table);
+	});
+
 });
