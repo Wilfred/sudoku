@@ -180,4 +180,9 @@ $(document).ready(function() {
 		var solvedTable = sudokuSolver.findSolution(blankTable);
 		sudokuSolver.setTable(solvedTable);
 	});
+
+	$('button#clear_table').click(function() {
+		var blankTable = sudokuSolver.createBlankTable();
+		sudokuSolver.setTable(blankTable);
+	});
 });
