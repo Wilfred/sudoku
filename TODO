@@ -6,3 +6,4 @@ support m x n sudoku
 allow puzzles to be generated of varying difficulty
 add clear button
 update screen.css with the actual URL
+separate table into its own class
