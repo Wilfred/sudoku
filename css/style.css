@@ -80,6 +80,10 @@
 	padding: 0;
 }
 
+#sudoku td.user_value input {
+	color: blue;
+}
+
 
 
 /**************************************/

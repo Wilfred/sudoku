@@ -35,6 +35,28 @@ var sudokuSolver = {
 		return columns;
 	},
 
+	addUserValuesClass: function() {
+		// add an additional class to user-provided cells, so
+		// we can style them differently
+		$("#sudoku td input").each(function(index, element) {
+			var $input = $(element);
+
+			console.log($input.val());
+
+			if ($input.val() !== BLANK) {
+				$input.parent().addClass("user_value");
+			}
+		});
+	},
+
+	removeUserValuesClass: function() {
+		// undoes addUserValuesClass
+		$("#sudoku td").each(function(index, element) {
+			var $td = $(element);
+			$td.removeClass("user_value");
+		});
+	},
+
 	setTable: function(table) {
 		$("#sudoku tr").each(function(y, element) {
 			$("td input", $(element)).each(function(x, element) {
@@ -176,12 +198,16 @@ var sudokuSolver = {
 
 $(document).ready(function() {
 	$('button#fill_table').click(function() {
+		sudokuSolver.addUserValuesClass();
+		
 		var currentTable = sudokuSolver.getTable();
 		var solvedTable = sudokuSolver.findSolution(currentTable);
 		sudokuSolver.setTable(solvedTable);
 	});
 
 	$('button#clear_table').click(function() {
+		sudokuSolver.removeUserValuesClass();
+		
 		var blankTable = sudokuSolver.createBlankTable();
 		sudokuSolver.setTable(blankTable);
 	});
