@@ -39,6 +39,14 @@
 #ui {
 	font-size: 20px;
 }
+#ui ul {
+	margin: 0;
+	list-style-type: none;
+}
+#ui button {
+	float: none;
+}
+
 
 #sudoku {
 	border: 3px #888 solid;
