@@ -6,3 +6,4 @@ add tbody element
 support m x n sudoku
 allow puzzles to be generated of varying difficulty
 add clear button
+allow input of puzzles using dot format
