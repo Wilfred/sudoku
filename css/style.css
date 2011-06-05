@@ -11,9 +11,8 @@
 /**************************************
 - black		#000
 - white		#fff
--           #
--           #
--           #
+- grey          #888
+
 ***************************************/
 
 
@@ -37,21 +36,12 @@
 /**************************************/
 /*            MAIN CONTENT            */
 /**************************************/
-table#sudoku {
-	border-collapse: collapse;
-}
-
-#sudoku td {
-	border: 1px black solid;
-}
-
-
 #sudoku {
-	border: 3px black solid;
+	border: 3px #888 solid;
 }
 
 #sudoku #row-3, #sudoku #row-6 {
-	border-top: 3px black solid;
+	border-top: 3px #888 solid;
 }
 
 #sudoku #cell-3, #sudoku #cell-6, #sudoku #cell-12, #sudoku #cell-15,
@@ -59,18 +49,25 @@ table#sudoku {
 #sudoku #cell-39,  #sudoku #cell-42, #sudoku #cell-48, #sudoku #cell-51,
 #sudoku #cell-57, #sudoku  #cell-60, #sudoku #cell-66, #sudoku #cell-69,
 #sudoku #cell-75, #sudoku #cell-78 {
-	border-left: 3px black solid;
+	border-left: 3px #888 solid;
 }
 
 
-
-input[type=text] {
+#sudoku input[type=text] {
+	padding: 0;
 	border: none;
-	width: 40px;
-	height: 40px;
+	width: 45px;
+	height: 45px;
 	text-align: center;
-	font-size: 40px;
+	font-size: 45px;
 }
+
+
+#sudoku td {
+	margin: 0;
+	padding: 0;
+}
+
 
 
 /**************************************/
