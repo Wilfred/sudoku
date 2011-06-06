@@ -43,13 +43,22 @@
 	margin: 0;
 	list-style-type: none;
 }
+#ui li {
+	margin: 0;
+}
 #ui button {
 	float: none;
+	margin-bottom: 10px;
+	min-width: 150px;
+	text-align: left;
 }
 
 
-#sudoku {
+table#sudoku {
 	border: 3px #888 solid;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 0;
 }
 
 #sudoku #row-3, #sudoku #row-6 {
