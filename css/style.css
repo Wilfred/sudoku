@@ -81,6 +81,7 @@ table#sudoku {
 	height: 45px;
 	text-align: center;
 	font-size: 45px;
+	color: #888;
 }
 
 
@@ -90,7 +91,7 @@ table#sudoku {
 }
 
 #sudoku td.user_value input {
-	color: blue;
+	color: #3333AA;
 }
 
 
