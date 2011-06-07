@@ -21,8 +21,8 @@ SudokuGrid.prototype.setFromSelector = function(selector) {
 	var x, y;
 	var self = this
 	selector.each(function(index, element) {
-		x = Math.floor(index / BOARDSIZE);
-		y = index % BOARDSIZE;
+		x = index % BOARDSIZE;
+		y = Math.floor(index / BOARDSIZE);
 		self.grid[x][y] = $(element).val();
 	});
 };
@@ -37,8 +37,8 @@ SudokuGrid.prototype.setFromString = function(string) {
 		value = string.charAt(i);
 		
 		if (value in VALUES) {
-			x = Math.floor(i / BOARDSIZE);
-			y = i % BOARDSIZE;
+			x = i % BOARDSIZE;
+			y = Math.floor(i / BOARDSIZE);
 			this.grid[x][y] = value;
 		}
 	}
