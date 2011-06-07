@@ -7,6 +7,137 @@ var BOARDSIZE = GROUPWIDTH * GROUPHEIGHT;
 var BLANK = "";
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+function SudokuGrid() {
+	// create empty grid
+	this.grid = [];
+	for (var i=0; i<BOARDSIZE; i++) {
+		this.grid.push([]);
+	}
+	
+}
+
+SudokuGrid.prototype.setFromSelector = function(selector) {
+	// set this table based on the text inputs provided by a selector
+	var x, y;
+	var self = this
+	selector.each(function(index, element) {
+		x = Math.floor(index / BOARDSIZE);
+		y = index % BOARDSIZE;
+		self.grid[x][y] = $(element).val();
+	});
+};
+
+SudokuGrid.prototype.setFromString = function(string) {
+	// this table based on a string of characters specifying the table
+	// example string: ".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."
+
+	var x, y, value;
+
+	for (var i=0; i<string.length; i++) {
+		value = string.charAt(i);
+		
+		if (value in VALUES) {
+			x = Math.floor(index / BOARDSIZE);
+			y = index % BOARDSIZE;
+			this.grid[x][y] = value;
+		}
+	}
+};
+
+SudokuGrid.prototype.clear = function() {
+	for (var i=0; i<BOARDSIZE; i++) {
+		for (var j=0; j<BOARDSIZE; j++) {
+			this.grid[i][j] = BLANK;
+		}
+	}
+};
+
+SudokuGrid.prototype.getRow = function(y) {
+	// get row at height y, where 0 is the top
+	var row = [];
+
+	$.each(this.grid, function(index, column) {
+		row.push(column[y]);
+	});
+
+	return row;
+	
+};
+
+SudokuGrid.prototype.getColumn = function(x) {
+	// get column which is x across, where 0 is leftmost
+	return this.grid[x]
+};
+
+SudokuGrid.prototype.getGroup = function(x, y) {
+	// get the group which is x groups across and y groups down
+	// returning a 1-D array
+	var group = [];
+
+	var total = 0;
+	for (var i=x*GROUPWIDTH; i<(x+1)*GROUPWIDTH; i++) {
+		for (var j=y*GROUPHEIGHT; j<(y+1)*GROUPHEIGHT; j++) {
+			group.push(this.grid[i][j]);
+		}
+	}
+
+	return group;
+};
+
+// todo: use underscore.js grooviness to make this cleaner:
+SudokuGrid.prototype.isRegionValid = function(region) {
+	// check that a given array contains no duplicates
+	// TODO: also check that all values are legal
+	var seenSoFar = {};
+
+	for (var i=0; i<region.length; i++) {
+		if (region[i] !== BLANK && region[i] in seenSoFar) {
+			return false;
+		} else {
+			seenSoFar[region[i]] = true;
+		}
+	}
+	
+	return true;
+};
+
+SudokuGrid.prototype.isTableValid = function(table) {
+	// could this table be a valid solution, or part of
+	// one? We tolerate blanks
+		
+	// check rows
+	var row;
+	for (var i=0; i<BOARDSIZE; i++) {
+		row = this.getRow(i);
+		if (!this.isRegionValid(row)) {
+			return false;
+		}
+	}
+
+	// check columns
+	var column;
+	for (var j=0; j<BOARDSIZE; j++) {
+		column = this.getColumn(j);
+		if (!this.isRegionValid(column)) {
+			return false;
+		}
+	}
+
+	// check groups
+	var group;
+	for (var i=0; i<BOARDSIZE/GROUPWIDTH; i++) {
+		for (var j=0; j<BOARDSIZE/GROUPHEIGHT; j++) {
+			group = this.getGroup(i, j)
+			if (!this.isRegionValid(group)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+};
+
+
 var sudokuSolver = {
 	clearTable: function() {
 		// set the table in the DOM to be blank
@@ -16,52 +147,6 @@ var sudokuSolver = {
 		sudokuSolver.setTable(blankTable);
 	},
 	
-	getTableFromDom: function() {
-		// start with a blank table
-		var table = sudokuSolver.createBlankTable();
-
-		// then write in the current values
-		$("#sudoku tr").each(function(y, element) {
-			$("td input", $(element)).each(function(x, element) {
-				table[x][y] = $(element).val();
-			});
-		});
-
-		return table;
-	},
-
-	getTableFromString: function(string) {
-		// given a string of characters specifying the table,
-		// return a table populated with those values
-
-		// example string: ".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."
-		var table = sudokuSolver.createBlankTable();
-
-		var value;
-		for (var i=0; i<string.length; i++) {
-			value = string.charAt(i);
-
-			if (value in VALUES) {
-				table[Math.floor(i / BOARDSIZE)][i % BOARDSIZE] = value;
-			}
-		}
-
-		return table;
-	},
-
-	createBlankTable: function() {
-		// create an array of BOARDSIZE x BOARDSIZE, filled with blanks
-		var columns = [];
-		for (var i=0; i<BOARDSIZE; i++) {
-			var column = [];
-			for (var j=0; j<BOARDSIZE; j++) {
-				column.push(BLANK);
-			}
-			columns.push(column);
-		}
-		return columns;
-	},
-
 	addUserValuesClass: function() {
 		// add an additional class to user-provided cells, so
 		// we can style them differently
@@ -85,95 +170,12 @@ var sudokuSolver = {
 	setTable: function(table) {
 		$("#sudoku tr").each(function(y, element) {
 			$("td input", $(element)).each(function(x, element) {
-				$(element).val(table[x][y]);
+				$(element).val(table.grid[x][y]);
 			});
 		});
 		
 	},
 
-	getRow: function(table, y) {
-		// get row at height y, where 0 is the top
-		var row = [];
-
-		$.each(table, function(index, column) {
-			row.push(column[y]);
-		});
-
-		return row;
-	},
-
-	getColumn: function(table, x) {
-		// get column which is x across, where 0 is leftmost
-		return table[x];
-	},
-
-	getGroup: function(table, x, y) {
-		// get the group which is x groups across and y groups down
-		// returning a 1-D array
-		var group = [];
-
-		var total = 0;
-		for (var i=x*GROUPWIDTH; i<(x+1)*GROUPWIDTH; i++) {
-			for (var j=y*GROUPHEIGHT; j<(y+1)*GROUPHEIGHT; j++) {
-				group.push(table[i][j]);
-			}
-		}
-
-		return group;
-	},
-
-	// todo: use underscore.js grooviness to make this cleaner:
-	isRegionValid: function(region) {
-		// check that a given array contains no duplicates
-		// TODO: also check that all values are legal
-		var seenSoFar = {};
-
-		for (var i=0; i<region.length; i++) {
-			if (region[i] !== BLANK && region[i] in seenSoFar) {
-				return false;
-			} else {
-				seenSoFar[region[i]] = true;
-			}
-		}
-
-		return true;
-	},
-
-	isTableValid: function(table) {
-		// could this table be a valid solution, or part of
-		// one? We tolerate blanks
-		
-		// check rows
-		var row;
-		for (var i=0; i<BOARDSIZE; i++) {
-			row = sudokuSolver.getRow(table, i);
-			if (!sudokuSolver.isRegionValid(row)) {
-				return false;
-			}
-		}
-
-		// check columns
-		var column;
-		for (var j=0; j<BOARDSIZE; j++) {
-			column = sudokuSolver.getColumn(table, j);
-			if (!sudokuSolver.isRegionValid(column)) {
-				return false;
-			}
-		}
-
-		// check groups
-		var group;
-		for (var i=0; i<BOARDSIZE/GROUPWIDTH; i++) {
-			for (var j=0; j<BOARDSIZE/GROUPHEIGHT; j++) {
-				group = sudokuSolver.getGroup(table, i, j)
-				if (!sudokuSolver.isRegionValid(group)) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	},
 
 	findNextEmptySquare: function(table) {
 		// return the (x,y) of the next point which is blank
@@ -181,7 +183,7 @@ var sudokuSolver = {
 		// produces more attractive (IMHO) results
 		for (var y=0; y<BOARDSIZE; y++) {
 			for (var x=0; x<BOARDSIZE; x++) {
-				if (table[x][y] === BLANK) {
+				if (table.grid[x][y] === BLANK) {
 					return [x, y];
 				}
 			}
@@ -198,9 +200,9 @@ var sudokuSolver = {
 			var y = nextEmptySquare[1];
 
 			for (var i=0; i<VALUES.length; i++) {
-				table[x][y] = VALUES[i];
+				table.grid[x][y] = VALUES[i];
 
-				if (sudokuSolver.isTableValid(table)) { // valid so far
+				if (table.isTableValid()) { // valid so far
 					var solution = sudokuSolver.findSolution(table);
 					if (solution !== false) {
 						return solution;
@@ -208,7 +210,7 @@ var sudokuSolver = {
 				} else {
 					// reset this square for the backtracking
 					// FIXME: this overwrites user-provided values
-					table[x][y] = BLANK;
+					table.grid[x][y] = BLANK;
 				}
 			}
 
@@ -224,8 +226,10 @@ var sudokuSolver = {
 $(document).ready(function() {
 	$('button#fill_table').click(function() {
 		sudokuSolver.addUserValuesClass();
+
+		var currentTable = new SudokuGrid();
+		currentTable.setFromSelector($("#sudoku input"));
 		
-		var currentTable = sudokuSolver.getTableFromDom();
 		var solvedTable = sudokuSolver.findSolution(currentTable);
 		sudokuSolver.setTable(solvedTable);
 	});
