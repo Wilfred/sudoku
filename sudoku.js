@@ -37,8 +37,8 @@ SudokuGrid.prototype.setFromString = function(string) {
 		value = string.charAt(i);
 		
 		if (value in VALUES) {
-			x = Math.floor(index / BOARDSIZE);
-			y = index % BOARDSIZE;
+			x = Math.floor(i / BOARDSIZE);
+			y = i % BOARDSIZE;
 			this.grid[x][y] = value;
 		}
 	}
@@ -101,7 +101,7 @@ SudokuGrid.prototype.isRegionValid = function(region) {
 	return true;
 };
 
-SudokuGrid.prototype.isTableValid = function(table) {
+SudokuGrid.prototype.isValid = function(table) {
 	// could this table be a valid solution, or part of
 	// one? We tolerate blanks
 		
@@ -143,7 +143,7 @@ var sudokuSolver = {
 		// set the table in the DOM to be blank
 		sudokuSolver.removeUserValuesClass();
 		
-		var blankTable = sudokuSolver.createBlankTable();
+		var blankTable = new SudokuGrid();
 		sudokuSolver.setTable(blankTable);
 	},
 	
@@ -202,7 +202,7 @@ var sudokuSolver = {
 			for (var i=0; i<VALUES.length; i++) {
 				table.grid[x][y] = VALUES[i];
 
-				if (table.isTableValid()) { // valid so far
+				if (table.isValid()) { // valid so far
 					var solution = sudokuSolver.findSolution(table);
 					if (solution !== false) {
 						return solution;
@@ -242,7 +242,9 @@ $(document).ready(function() {
 		sudokuSolver.clearTable();
 
 		var puzzleString = prompt("Enter a puzzle string:");
-		var table = sudokuSolver.getTableFromString(puzzleString);
+
+		var table = new SudokuGrid();
+		table.setFromString(puzzleString);
 		sudokuSolver.setTable(table);
 	});
 
