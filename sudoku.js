@@ -163,14 +163,13 @@ SudokuGrid.prototype.isValid = function(table) {
 	return true;
 };
 
-
-var sudokuSolver = {
+var ui = {
 	clearTable: function() {
 		// set the table in the DOM to be blank
-		sudokuSolver.removeUserValuesClass();
+		ui.removeUserValuesClass();
 		
 		var blankTable = new SudokuGrid();
-		sudokuSolver.setTable(blankTable);
+		ui.setTable(blankTable);
 	},
 	
 	addUserValuesClass: function() {
@@ -200,11 +199,17 @@ var sudokuSolver = {
 			});
 		});
 		
-	},
+	}
+}
+
+
+var solver = {
 
 	findSolution: function(table) {
 		// given a SudokuGrid, return an object saying whether
 		// we found a solution, and if so what it is
+
+		// we simply brute force a solution here
 		
 		// todo: treat tables as immutable data
 		var emptyPositions = table.getEmptyPositions();
@@ -219,7 +224,7 @@ var sudokuSolver = {
 				table.grid[x][y] = possibleValues[i];
 
 				if (table.isValid()) { // valid so far
-					var result = sudokuSolver.findSolution(table);
+					var result = solver.findSolution(table);
 					if (result.isSolution) {
 						// found a solution on this branch! hurrah!
 						return result;
@@ -241,27 +246,27 @@ var sudokuSolver = {
 
 $(document).ready(function() {
 	$('button#fill_table').click(function() {
-		sudokuSolver.addUserValuesClass();
+		ui.addUserValuesClass();
 
 		var currentTable = new SudokuGrid();
 		currentTable.setFromSelector($("#sudoku input"));
 		
-		var solvedTable = sudokuSolver.findSolution(currentTable).table;
-		sudokuSolver.setTable(solvedTable);
+		var solvedTable = solver.findSolution(currentTable).table;
+		ui.setTable(solvedTable);
 	});
 
 	$('button#clear_table').click(function() {
-		sudokuSolver.clearTable();
+		ui.clearTable();
 	});
 
 	$('button#import_puzzle').click(function() {
-		sudokuSolver.clearTable();
+		ui.clearTable();
 
 		var puzzleString = prompt("Enter a puzzle string:");
 
 		var table = new SudokuGrid();
 		table.setFromString(puzzleString);
-		sudokuSolver.setTable(table);
+		ui.setTable(table);
 	});
 
 });

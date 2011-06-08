@@ -1,4 +1,3 @@
-separate sudokuSolver into UI and solver
 be consistent with terminology regarding table vs grid
 use objects for points rather than arrays
 
