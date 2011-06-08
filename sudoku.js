@@ -167,6 +167,7 @@ var ui = {
 	clearTable: function() {
 		// set the table in the DOM to be blank
 		ui.removeUserValuesClass();
+		$("#invalid_table").hide();
 		
 		var blankTable = new SudokuGrid();
 		ui.setTable(blankTable);
@@ -190,6 +191,18 @@ var ui = {
 			var $td = $(element);
 			$td.removeClass("user_value");
 		});
+	},
+
+	checkTableIsValid: function() {
+		var currentTable = new SudokuGrid();
+		currentTable.setFromSelector($("#sudoku input"));
+
+		if (!currentTable.isValid()) {
+			$("#invalid_table").show();
+		} else {
+			$("#invalid_table").hide();
+		}
+		
 	},
 
 	setTable: function(table) {
@@ -267,6 +280,12 @@ $(document).ready(function() {
 		var table = new SudokuGrid();
 		table.setFromString(puzzleString);
 		ui.setTable(table);
+		ui.checkTableIsValid();
+	});
+
+	// monitor table for changes, and warn immediately if the grid is invalid
+	$("#sudoku input").keyup(function() {
+		ui.checkTableIsValid();
 	});
 
 });

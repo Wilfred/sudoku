@@ -36,8 +36,11 @@
 /**************************************/
 /*            MAIN CONTENT            */
 /**************************************/
-#ui {
+#ui, #main {
 	font-size: 20px;
+}
+#invalid_table {
+	display: none;
 }
 #ui ul {
 	margin: 0;
