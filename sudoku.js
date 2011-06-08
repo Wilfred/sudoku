@@ -124,6 +124,27 @@ SudokuGrid.prototype.getEmptyPositions = function() {
 	return emptyPositions;
 };
 
+SudokuGrid.prototype.getPossibilities = function(x, y) {
+	// get all the possible values that can go in this position, based on neighbours
+	var possibilities = [];
+	var possibleValues = this.getPossibleValues();
+
+	for (var i=0; i<possibleValues.length; i++) {
+		var value = possibleValues[i];
+
+		var groupX = Math.floor(x / GROUPWIDTH);
+		var groupY = Math.floor(y / GROUPHEIGHT);
+
+		if (!arrayContains(value, this.getRow(y)) &&
+		    !arrayContains(value, this.getColumn(x)) &&
+		    !arrayContains(value, this.getGroup(groupX, groupY))) {
+				possibilities.push(value);
+		}
+	}
+
+	return possibilities;
+}
+
 // todo: use underscore.js grooviness to make this cleaner:
 SudokuGrid.prototype.isRegionValid = function(region) {
 	// check that a given array contains no duplicates
@@ -271,6 +292,37 @@ var solver = {
 	}
 }
 
+var crossOffSolver = {
+	findSolution: function(grid) {
+		// given a sudoku grid, find a solution by iteratively finding
+		// squares that whose values we can infer from the current grid
+
+		var emptyPositions = grid.getEmptyPositions();
+
+		if (emptyPositions.length) {
+			for (var i=0; i<emptyPositions.length; i++) {
+				var x = emptyPositions[i].x;
+				var y = emptyPositions[i].y;
+
+				var possibiltiesHere = grid.getPossibilities(x, y);
+
+				if (possibiltiesHere.length == 1) {
+					// we're certain about this position, so set it then recurse
+					grid.grid[x][y] = possibiltiesHere[0];
+					return crossOffSolver.findSolution(grid);
+				}
+			}
+
+			// didn't manage to make any progress this
+			// iteration, so we can't solve with this approach
+			return {isSolution: false, table: grid}
+		} else {
+			// full grid! done!
+			return {isSolution: true, table: grid}
+		}
+	}
+};
+
 $(document).ready(function() {
 	$('button#fill_table').click(function() {
 		ui.addUserValuesClass();
@@ -281,6 +333,22 @@ $(document).ready(function() {
 		var solvedTable = solver.findSolution(currentTable).table;
 		ui.setTable(solvedTable);
 	});
+
+	$('button#solve_with_cross_off').click(function() {
+		ui.addUserValuesClass();
+
+		var currentTable = new SudokuGrid();
+		currentTable.setFromSelector($("#sudoku input"));
+
+		var result = crossOffSolver.findSolution(currentTable);
+		if (result.isSolution) {
+			var solvedTable = crossOffSolver.findSolution(currentTable).table;
+			ui.setTable(solvedTable);
+		} else {
+			ui.removeUserValuesClass();
+		}
+	});
+	
 
 	$('button#clear_table').click(function() {
 		ui.clearTable();
