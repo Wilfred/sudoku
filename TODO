@@ -1,6 +1,9 @@
+separate sudokuSolver into UI and solver
+be consistent with terminology regarding table vs grid
+use objects for points rather than arrays
+
 handle invalid tables (invalid values or unsolvable) better
 port to coffeescript
-add borders around groups in table
 add tbody element
 support m x n sudoku
 allow puzzles to be generated of varying difficulty
