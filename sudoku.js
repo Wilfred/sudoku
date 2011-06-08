@@ -115,7 +115,7 @@ SudokuGrid.prototype.getEmptyPositions = function() {
 	
 	for (var y=0; y<BOARDSIZE; y++) {
 		for (var x=0; x<BOARDSIZE; x++) {
-			if (this.grid[x][y] === BLANK) {
+			if (this.grid[x][y] === undefined) {
 				emptyPositions.push({x: x, y: y});
 			}
 		}
@@ -260,7 +260,7 @@ var solver = {
 			}
 
 			// reset this square so we're back where we started for backtracking
-			table.grid[x][y] = BLANK;
+			table.grid[x][y] = undefined;
 
 			// still have empty squares, but no solution
 			return {isSolution: false, table: table};
