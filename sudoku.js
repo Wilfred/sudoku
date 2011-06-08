@@ -6,6 +6,16 @@ var BOARDSIZE = GROUPWIDTH * GROUPHEIGHT;
 
 var BLANK = "";
 
+// utilties:
+function arrayContains(value, array) {
+	for (var i=0; i<array.length; i++) {
+		if (array[i] === value) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function SudokuGrid() {
 	// create empty grid
 	this.grid = [];
@@ -33,7 +43,11 @@ SudokuGrid.prototype.setFromSelector = function(selector) {
 	selector.each(function(index, element) {
 		x = index % BOARDSIZE;
 		y = Math.floor(index / BOARDSIZE);
-		self.grid[x][y] = $(element).val();
+
+		value = $(element).val()
+		if (value != BLANK) {
+			self.grid[x][y] = parseInt(value, 10);
+		}
 	});
 };
 
@@ -117,7 +131,7 @@ SudokuGrid.prototype.isRegionValid = function(region) {
 	var seenSoFar = {};
 
 	for (var i=0; i<region.length; i++) {
-		if (region[i] !== BLANK && region[i] in seenSoFar) {
+		if (region[i] !== undefined && region[i] in seenSoFar) {
 			return false;
 		} else {
 			seenSoFar[region[i]] = true;
