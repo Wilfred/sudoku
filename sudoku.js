@@ -30,7 +30,6 @@ SudokuGrid.prototype.setFromSelector = function(selector) {
 SudokuGrid.prototype.setFromString = function(string) {
 	// this table based on a string of characters specifying the table
 	// example string: ".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."
-
 	var x, y, value;
 
 	for (var i=0; i<string.length; i++) {
@@ -82,6 +81,23 @@ SudokuGrid.prototype.getGroup = function(x, y) {
 	}
 
 	return group;
+};
+
+SudokuGrid.prototype.getEmptyPositions = function() {
+	// get an array of co-ordinates of all the blank squares
+	// deliberately iterating over x first as it often
+	// produces more attractive (IMHO) results
+	var emptyPositions = [];
+	
+	for (var y=0; y<BOARDSIZE; y++) {
+		for (var x=0; x<BOARDSIZE; x++) {
+			if (this.grid[x][y] === BLANK) {
+				emptyPositions.push([x, y]);
+			}
+		}
+	}
+
+	return emptyPositions;
 };
 
 // todo: use underscore.js grooviness to make this cleaner:
@@ -176,49 +192,38 @@ var sudokuSolver = {
 		
 	},
 
-
-	findNextEmptySquare: function(table) {
-		// return the (x,y) of the next point which is blank
-		// deliberately iterating over x first as it often
-		// produces more attractive (IMHO) results
-		for (var y=0; y<BOARDSIZE; y++) {
-			for (var x=0; x<BOARDSIZE; x++) {
-				if (table.grid[x][y] === BLANK) {
-					return [x, y];
-				}
-			}
-		}
-	},
-
 	findSolution: function(table) {
+		// given a SudokuGrid, return an object saying whether
+		// we found a solution, and if so what it is
+		
 		// todo: treat tables as immutable data
-		var nextEmptySquare = sudokuSolver.findNextEmptySquare(table);
+		var emptyPositions = table.getEmptyPositions();
 
-		if (nextEmptySquare) {
+		if (emptyPositions.length) {
 			// try each of the possible values in the next empty square
-			var x = nextEmptySquare[0];
-			var y = nextEmptySquare[1];
+			var x = emptyPositions[0][0];
+			var y = emptyPositions[0][1];
 
 			for (var i=0; i<VALUES.length; i++) {
 				table.grid[x][y] = VALUES[i];
 
 				if (table.isValid()) { // valid so far
-					var solution = sudokuSolver.findSolution(table);
-					if (solution !== false) {
-						return solution;
+					var result = sudokuSolver.findSolution(table);
+					if (result.isSolution) {
+						// found a solution on this branch! hurrah!
+						return result;
 					}
-				} else {
-					// reset this square for the backtracking
-					// FIXME: this overwrites user-provided values
-					table.grid[x][y] = BLANK;
 				}
 			}
 
-			// no empty square, but no solution
-			return false
+			// reset this square so we're back where we started for backtracking
+			table.grid[x][y] = BLANK;
+
+			// still have empty squares, but no solution
+			return {isSolution: false, table: table};
 		} else {
 			// table is full, we have a solutoin
-			return table;
+			return {isSolution: true, table: table};
 		}
 	}
 }
@@ -230,7 +235,7 @@ $(document).ready(function() {
 		var currentTable = new SudokuGrid();
 		currentTable.setFromSelector($("#sudoku input"));
 		
-		var solvedTable = sudokuSolver.findSolution(currentTable);
+		var solvedTable = sudokuSolver.findSolution(currentTable).table;
 		sudokuSolver.setTable(solvedTable);
 	});
 
