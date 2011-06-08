@@ -5,7 +5,6 @@ var GROUPHEIGHT = 3;
 var BOARDSIZE = GROUPWIDTH * GROUPHEIGHT;
 
 var BLANK = "";
-var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 function SudokuGrid() {
 	// create empty grid
@@ -14,6 +13,17 @@ function SudokuGrid() {
 		this.grid.push([]);
 	}
 	
+}
+
+SudokuGrid.prototype.getPossibleValues = function() {
+	// get all the possible values that a square can contain
+	var values = [];
+
+	for (var i=1; i <= BOARDSIZE; i++) {
+		values.push(i);
+	}
+
+	return values;
 }
 
 SudokuGrid.prototype.setFromSelector = function(selector) {
@@ -33,9 +43,9 @@ SudokuGrid.prototype.setFromString = function(string) {
 	var x, y, value;
 
 	for (var i=0; i<string.length; i++) {
-		value = string.charAt(i);
+		value = parseInt(string.charAt(i), 10);
 		
-		if (value in VALUES) {
+		if ($.inArray(value, this.getPossibleValues()) != -1) {
 			x = i % BOARDSIZE;
 			y = Math.floor(i / BOARDSIZE);
 			this.grid[x][y] = value;
@@ -198,14 +208,15 @@ var sudokuSolver = {
 		
 		// todo: treat tables as immutable data
 		var emptyPositions = table.getEmptyPositions();
+		var possibleValues = table.getPossibleValues();
 
 		if (emptyPositions.length) {
 			// try each of the possible values in the next empty square
 			var x = emptyPositions[0][0];
 			var y = emptyPositions[0][1];
 
-			for (var i=0; i<VALUES.length; i++) {
-				table.grid[x][y] = VALUES[i];
+			for (var i=0; i<possibleValues.length; i++) {
+				table.grid[x][y] = possibleValues[i];
 
 				if (table.isValid()) { // valid so far
 					var result = sudokuSolver.findSolution(table);
