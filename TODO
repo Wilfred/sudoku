@@ -1,12 +1,13 @@
 be consistent with terminology regarding table vs grid
-use objects for points rather than arrays
+fix the possibilities/possibleValues confusion
+add puzzle export functionality
 
-handle invalid tables (invalid values or unsolvable) better
+deal with invalid values in table
 port to coffeescript
 add tbody element
 support m x n sudoku
 allow puzzles to be generated of varying difficulty
-add clear button
 update screen.css with the actual URL
 add unit tests
-fix the fact that it breaks on star burst leo: 9--1-4--2-8--6--7----------4-------1-7-----3-3-------7----------3--7--8-1--2-9--4
+show solution in a different colour instead of user input
+improve performance
