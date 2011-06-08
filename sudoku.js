@@ -102,7 +102,7 @@ SudokuGrid.prototype.getEmptyPositions = function() {
 	for (var y=0; y<BOARDSIZE; y++) {
 		for (var x=0; x<BOARDSIZE; x++) {
 			if (this.grid[x][y] === BLANK) {
-				emptyPositions.push([x, y]);
+				emptyPositions.push({x: x, y: y});
 			}
 		}
 	}
@@ -230,8 +230,8 @@ var solver = {
 
 		if (emptyPositions.length) {
 			// try each of the possible values in the next empty square
-			var x = emptyPositions[0][0];
-			var y = emptyPositions[0][1];
+			var x = emptyPositions[0].x;
+			var y = emptyPositions[0].y;
 
 			for (var i=0; i<possibleValues.length; i++) {
 				table.grid[x][y] = possibleValues[i];
