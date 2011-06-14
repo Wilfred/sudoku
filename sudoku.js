@@ -323,6 +323,76 @@ var crossOffSolver = {
 	}
 };
 
+var backtrackingCrossOffSolver = {
+	getMostContstrainedPositions: function(grid) {
+		// given a sudoku grid, return an array of objects:
+		// [{x: 1, y:0, possibities: [2,3,6]} ..]
+		// sorted so the least possibilites are first in the array
+		var emptyPositions = grid.getEmptyPositions();
+		var possibilitiesInGrid = [];
+
+		for (var i=0; i<emptyPositions.length; i++) {
+			var x = emptyPositions[i].x;
+			var y = emptyPositions[i].y;
+
+			var possibiltiesHere = grid.getPossibilities(x, y);
+
+			possibilitiesInGrid.push({
+				x: x, y: y, possibilities: possibiltiesHere
+			});
+		}
+
+		possibilitiesInGrid.sort(backtrackingCrossOffSolver.comparePossibilites);
+
+		return possibilitiesInGrid;
+
+	},
+
+	comparePossibilites: function(a, b) {
+		// a comparison function that compares the length of the possibilies array
+		if (a.possibilities.length < b.possibilities.length) {
+			return -1;
+		} else if (a.possibilities.length === b.possibilities.length) {
+			return 0;
+		}
+		return 1;
+	},
+	
+	findSolution: function(grid) {
+		// given a sudoku grid, use a backtracking brute-force
+		// algorithm, starting with the most constrained
+		// positions
+
+		var possibilitiesInGrid = backtrackingCrossOffSolver.getMostContstrainedPositions(grid);
+
+		if (possibilitiesInGrid.length) {
+			// try each of the possible values in this empty square
+			var x = possibilitiesInGrid[0].x;
+			var y = possibilitiesInGrid[0].y;
+
+			var possibitiesHere = possibilitiesInGrid[0].possibilities
+			for (var i=0; i<possibitiesHere.length; i++) {
+				grid.grid[x][y] = possibitiesHere[i];
+
+				if (grid.isValid()) { // valid so far
+					var result = solver.findSolution(grid);
+					if (result.isSolution) {
+						// found a solution on this branch! hurrah!
+						return result;
+					}
+				}
+			}
+
+			// didn't manage to make any progress this
+			// iteration, so we can't solve with this approach
+			return {isSolution: false, table: grid}
+		} else {
+			// full grid! done!
+			return {isSolution: true, table: grid}
+		}
+	}
+};
+
 $(document).ready(function() {
 	$('button#fill_table').click(function() {
 		ui.addUserValuesClass();
@@ -343,6 +413,15 @@ $(document).ready(function() {
 		var result = crossOffSolver.findSolution(currentTable);
 		if (result.isSolution) {
 			var solvedTable = crossOffSolver.findSolution(currentTable).table;
+	$('button#intelligent_brute_force').click(function() {
+		ui.addUserValuesClass();
+
+		var currentTable = new SudokuGrid();
+		currentTable.setFromSelector($("#sudoku input"));
+
+		var result = backtrackingCrossOffSolver.findSolution(currentTable);
+		if (result.isSolution) {
+			var solvedTable = result.table;
 			ui.setTable(solvedTable);
 		} else {
 			ui.removeUserValuesClass();
