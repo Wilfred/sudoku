@@ -412,7 +412,7 @@ $(document).ready(function() {
 
 		var result = crossOffSolver.findSolution(currentTable);
 		if (result.isSolution) {
-			var solvedTable = crossOffSolver.findSolution(currentTable).table;
+			var solvedTable = result.table;
 			ui.setTable(solvedTable);
 		} else {
 			ui.removeUserValuesClass();
