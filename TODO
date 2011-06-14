@@ -1,6 +1,7 @@
 be consistent with terminology regarding table vs grid
 fix the possibilities/possibleValues confusion
 add puzzle export functionality
+use an explicit blank value in grid
 
 deal with invalid values in table
 port to coffeescript
@@ -11,3 +12,4 @@ update screen.css with the actual URL
 add unit tests
 show solution in a different colour instead of user input
 improve performance
+
