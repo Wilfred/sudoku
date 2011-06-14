@@ -36,6 +36,9 @@
 /**************************************/
 /*            MAIN CONTENT            */
 /**************************************/
+body {
+	margin-left: 20px;
+}
 #ui, #main {
 	font-size: 20px;
 }
@@ -105,9 +108,9 @@ button {
 
 table#sudoku {
 	border: 3px #888 solid;
-	margin-left: auto;
-	margin-right: auto;
 	padding: 0;
+	width: 100%;
+	height: 100%;
 }
 
 #sudoku #row-3, #sudoku #row-6 {
