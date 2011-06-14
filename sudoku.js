@@ -1,7 +1,7 @@
 var GROUPWIDTH = 3;
 var GROUPHEIGHT = 3;
 
-// board height = borad width, since a sudoku board is square
+// board height = board width, since a sudoku board is square
 var BOARDSIZE = GROUPWIDTH * GROUPHEIGHT;
 
 var BLANK = "";
