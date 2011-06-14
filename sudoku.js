@@ -394,7 +394,7 @@ var backtrackingCrossOffSolver = {
 };
 
 $(document).ready(function() {
-	$('button#fill_table').click(function() {
+	$('button#solve_brute_force').click(function() {
 		ui.addUserValuesClass();
 
 		var currentTable = new SudokuGrid();
@@ -404,7 +404,7 @@ $(document).ready(function() {
 		ui.setTable(solvedTable);
 	});
 
-	$('button#solve_with_cross_off').click(function() {
+	$('button#solve_cross_off').click(function() {
 		ui.addUserValuesClass();
 
 		var currentTable = new SudokuGrid();
@@ -413,7 +413,13 @@ $(document).ready(function() {
 		var result = crossOffSolver.findSolution(currentTable);
 		if (result.isSolution) {
 			var solvedTable = crossOffSolver.findSolution(currentTable).table;
-	$('button#intelligent_brute_force').click(function() {
+			ui.setTable(solvedTable);
+		} else {
+			ui.removeUserValuesClass();
+		}
+	});
+	
+	$('button#solve_cross_off_brute_force').click(function() {
 		ui.addUserValuesClass();
 
 		var currentTable = new SudokuGrid();
