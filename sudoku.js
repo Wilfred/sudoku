@@ -375,7 +375,7 @@ var backtrackingCrossOffSolver = {
 				grid.grid[x][y] = possibilitiesHere[i];
 
 				if (grid.isValid()) { // valid so far
-					var result = solver.findSolution(grid);
+					var result = backtrackingCrossOffSolver.findSolution(grid);
 					if (result.isSolution) {
 						// found a solution on this branch! hurrah!
 						return result;
