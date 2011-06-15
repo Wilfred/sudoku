@@ -326,7 +326,7 @@ var crossOffSolver = {
 var backtrackingCrossOffSolver = {
 	getMostContstrainedPositions: function(grid) {
 		// given a sudoku grid, return an array of objects:
-		// [{x: 1, y:0, possibities: [2,3,6]} ..]
+		// [{x: 1, y:0, possibilities: [2,3,6]} ..]
 		// sorted so the least possibilites are first in the array
 		var emptyPositions = grid.getEmptyPositions();
 		var possibilitiesInGrid = [];
@@ -370,9 +370,9 @@ var backtrackingCrossOffSolver = {
 			var x = possibilitiesInGrid[0].x;
 			var y = possibilitiesInGrid[0].y;
 
-			var possibitiesHere = possibilitiesInGrid[0].possibilities
-			for (var i=0; i<possibitiesHere.length; i++) {
-				grid.grid[x][y] = possibitiesHere[i];
+			var possibilitiesHere = possibilitiesInGrid[0].possibilities
+			for (var i=0; i<possibilitiesHere.length; i++) {
+				grid.grid[x][y] = possibilitiesHere[i];
 
 				if (grid.isValid()) { // valid so far
 					var result = solver.findSolution(grid);
