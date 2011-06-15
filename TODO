@@ -11,5 +11,15 @@ allow puzzles to be generated of varying difficulty
 update screen.css with the actual URL
 add unit tests
 show solution in a different colour instead of user input
-improve performance
+improve performance, particularly for pathological:
+.........
+.....3.85
+..1.2....
+...5.7...
+..4...1..
+.9.......
+5......73
+..2.1....
+....4...9
+
 
