@@ -383,6 +383,10 @@ var backtrackingCrossOffSolver = {
 				}
 			}
 
+			// reset this square so we're back where we started for backtracking
+			grid.grid[x][y] = undefined;
+
+
 			// didn't manage to make any progress this
 			// iteration, so we can't solve with this approach
 			return {isSolution: false, table: grid}
