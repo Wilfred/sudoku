@@ -411,12 +411,10 @@ $(document).ready(function() {
 		currentTable.setFromSelector($("#sudoku input"));
 
 		var result = crossOffSolver.findSolution(currentTable);
-		if (result.isSolution) {
-			var solvedTable = result.table;
-			ui.setTable(solvedTable);
-		} else {
-			ui.removeUserValuesClass();
-		}
+
+		// set the table to this grid, as it may have solved
+		// some positions even if it didn't completely solve it
+		ui.setTable(result.table);
 	});
 	
 	$('button#solve_cross_off_brute_force').click(function() {
