@@ -302,12 +302,10 @@ var backtrackingCrossOffSolver = {
 			for (var i=0; i<possibilitiesHere.length; i++) {
 				grid.grid[x][y] = possibilitiesHere[i];
 
-				if (grid.isValid()) { // valid so far
-					var result = backtrackingCrossOffSolver.findSolution(grid);
-					if (result.isSolution) {
-						// found a solution on this branch! hurrah!
-						return result;
-					}
+				var result = backtrackingCrossOffSolver.findSolution(grid);
+				if (result.isSolution) {
+					// found a solution on this branch! hurrah!
+					return result;
 				}
 			}
 
@@ -332,7 +330,14 @@ $(document).ready(function() {
 		var currentTable = new SudokuGrid();
 		currentTable.setFromSelector($("#sudoku input"));
 
+		var start = new Date().getTime();
+		
 		var result = backtrackingCrossOffSolver.findSolution(currentTable);
+
+		var end = new Date().getTime();
+		var time = end - start;
+		alert('Execution time: ' + time);
+		
 		if (result.isSolution) {
 			var solvedTable = result.table;
 			ui.setTable(solvedTable);
