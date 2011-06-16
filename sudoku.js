@@ -251,78 +251,6 @@ var ui = {
 }
 
 
-var solver = {
-
-	findSolution: function(table) {
-		// given a SudokuGrid, return an object saying whether
-		// we found a solution, and if so what it is
-
-		// we simply brute force a solution here
-		
-		// todo: treat tables as immutable data
-		var emptyPositions = table.getEmptyPositions();
-		var possibleValues = table.getPossibleValues();
-
-		if (emptyPositions.length) {
-			// try each of the possible values in the next empty square
-			var x = emptyPositions[0].x;
-			var y = emptyPositions[0].y;
-
-			for (var i=0; i<possibleValues.length; i++) {
-				table.grid[x][y] = possibleValues[i];
-
-				if (table.isValid()) { // valid so far
-					var result = solver.findSolution(table);
-					if (result.isSolution) {
-						// found a solution on this branch! hurrah!
-						return result;
-					}
-				}
-			}
-
-			// reset this square so we're back where we started for backtracking
-			table.grid[x][y] = undefined;
-
-			// still have empty squares, but no solution
-			return {isSolution: false, table: table};
-		} else {
-			// table is full, we have a solutoin
-			return {isSolution: true, table: table};
-		}
-	}
-}
-
-var crossOffSolver = {
-	findSolution: function(grid) {
-		// given a sudoku grid, find a solution by iteratively finding
-		// squares that whose values we can infer from the current grid
-
-		var emptyPositions = grid.getEmptyPositions();
-
-		if (emptyPositions.length) {
-			for (var i=0; i<emptyPositions.length; i++) {
-				var x = emptyPositions[i].x;
-				var y = emptyPositions[i].y;
-
-				var possibiltiesHere = grid.getPossibilities(x, y);
-
-				if (possibiltiesHere.length == 1) {
-					// we're certain about this position, so set it then recurse
-					grid.grid[x][y] = possibiltiesHere[0];
-					return crossOffSolver.findSolution(grid);
-				}
-			}
-
-			// didn't manage to make any progress this
-			// iteration, so we can't solve with this approach
-			return {isSolution: false, table: grid}
-		} else {
-			// full grid! done!
-			return {isSolution: true, table: grid}
-		}
-	}
-};
-
 var backtrackingCrossOffSolver = {
 	getMostContstrainedPositions: function(grid) {
 		// given a sudoku grid, return an array of objects:
@@ -398,30 +326,7 @@ var backtrackingCrossOffSolver = {
 };
 
 $(document).ready(function() {
-	$('button#solve_brute_force').click(function() {
-		ui.addUserValuesClass();
-
-		var currentTable = new SudokuGrid();
-		currentTable.setFromSelector($("#sudoku input"));
-		
-		var solvedTable = solver.findSolution(currentTable).table;
-		ui.setTable(solvedTable);
-	});
-
-	$('button#solve_cross_off').click(function() {
-		ui.addUserValuesClass();
-
-		var currentTable = new SudokuGrid();
-		currentTable.setFromSelector($("#sudoku input"));
-
-		var result = crossOffSolver.findSolution(currentTable);
-
-		// set the table to this grid, as it may have solved
-		// some positions even if it didn't completely solve it
-		ui.setTable(result.table);
-	});
-	
-	$('button#solve_cross_off_brute_force').click(function() {
+	$('button#solve').click(function() {
 		ui.addUserValuesClass();
 
 		var currentTable = new SudokuGrid();
