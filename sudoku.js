@@ -299,23 +299,25 @@ var backtrackingCrossOffSolver = {
 			var y = possibilitiesInGrid[0].y;
 
 			var possibilitiesHere = possibilitiesInGrid[0].possibilities
-			for (var i=0; i<possibilitiesHere.length; i++) {
-				grid.grid[x][y] = possibilitiesHere[i];
 
-				var result = backtrackingCrossOffSolver.findSolution(grid);
-				if (result.isSolution) {
-					// found a solution on this branch! hurrah!
-					return result;
+			if (possibilitiesHere.length) {
+				// iterate over the possibilities until we find the correct one
+				for (var i=0; i<possibilitiesHere.length; i++) {
+					grid.grid[x][y] = possibilitiesHere[i];
+					
+					var result = backtrackingCrossOffSolver.findSolution(grid);
+					if (result.isSolution) {
+						// found a solution on this branch! hurrah!
+						return result;
+					}
 				}
-			}
+			} else {
+				// this table is unsolvable since there's a position with no possibilities
 
-			// reset this square so we're back where we started for backtracking
-			grid.grid[x][y] = undefined;
+				// reset this square so we're back where we started for backtracking
+				grid.grid[x][y] = undefined;
 
-
-			// didn't manage to make any progress this
-			// iteration, so we can't solve with this approach
-			return {isSolution: false, table: grid}
+				return {isSolution: false, table: grid}
 		} else {
 			// full grid! done!
 			return {isSolution: true, table: grid}
