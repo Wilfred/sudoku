@@ -99,7 +99,7 @@ button {
 #ui button {
 	float: none;
 	margin-bottom: 10px;
-	min-width: 240px;
+	min-width: 120px;
 	text-align: left;
 	padding-left: 10px;
 	padding-right: 0;
