@@ -124,6 +124,20 @@ SudokuGrid.prototype.getEmptyPositions = function() {
 	return emptyPositions;
 };
 
+SudokuGrid.prototype.isFull = function() {
+	// does every position on this grid have a value?
+	for (var y=0; y<BOARDSIZE; y++) {
+		for (var x=0; x<BOARDSIZE; x++) {
+			if (this.grid[x][y] === undefined) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+	
+}
+
 SudokuGrid.prototype.getPossibilities = function(x, y) {
 	// get all the possible values that can go in this position, based on neighbours
 	var possibilities = [];
@@ -165,6 +179,10 @@ SudokuGrid.prototype.isRegionValid = function(region) {
 SudokuGrid.prototype.isValid = function(table) {
 	// could this table be a valid solution, or part of
 	// one? We tolerate blanks
+
+	// note that we only check for obvious errors in a row, column
+	// or group, so it is still possible for an invalid grid to
+	// return true here
 		
 	// check rows
 	var row;
@@ -252,76 +270,68 @@ var ui = {
 
 
 var backtrackingCrossOffSolver = {
-	getMostContstrainedPositions: function(grid) {
-		// given a sudoku grid, return an array of objects:
-		// [{x: 1, y:0, possibilities: [2,3,6]} ..]
-		// sorted so the least possibilites are first in the array
+	getMostContstrainedPosition: function(grid) {
+		// given a sudoku grid, find the position with the fewest possibilities
+		// note that an invalid grid has positions with no possibilities
+		// {x: 1, y:0, possibilities: [2,3,6]}
 		var emptyPositions = grid.getEmptyPositions();
-		var possibilitiesInGrid = [];
+		var mostConstrainedPosition = null;
 
 		for (var i=0; i<emptyPositions.length; i++) {
 			var x = emptyPositions[i].x;
 			var y = emptyPositions[i].y;
 
-			var possibiltiesHere = grid.getPossibilities(x, y);
+			var possibilitiesHere = grid.getPossibilities(x, y);
 
-			possibilitiesInGrid.push({
-				x: x, y: y, possibilities: possibiltiesHere
-			});
+			if (possibilitiesHere.length === 0) {
+				// we will never find a more constrained position, so terminate early
+				return {x: x, y:y, possibilities: []};
+			}
+
+			if (mostConstrainedPosition === null ||
+			    possibilitiesHere.length < mostConstrainedPosition.possibilities.length) {
+				mostConstrainedPosition = {x: x, y:y, possibilities: possibilitiesHere};
+			}
+
 		}
 
-		possibilitiesInGrid.sort(backtrackingCrossOffSolver.comparePossibilites);
-
-		return possibilitiesInGrid;
+		return mostConstrainedPosition;
 
 	},
 
-	comparePossibilites: function(a, b) {
-		// a comparison function that compares the length of the possibilies array
-		if (a.possibilities.length < b.possibilities.length) {
-			return -1;
-		} else if (a.possibilities.length === b.possibilities.length) {
-			return 0;
-		}
-		return 1;
-	},
-	
 	findSolution: function(grid) {
 		// given a sudoku grid, use a backtracking brute-force
 		// algorithm, starting with the most constrained
 		// positions
 
-		var possibilitiesInGrid = backtrackingCrossOffSolver.getMostContstrainedPositions(grid);
-
-		if (possibilitiesInGrid.length) {
-			// try each of the possible values in this empty square
-			var x = possibilitiesInGrid[0].x;
-			var y = possibilitiesInGrid[0].y;
-
-			var possibilitiesHere = possibilitiesInGrid[0].possibilities
-
-			if (possibilitiesHere.length) {
-				// iterate over the possibilities until we find the correct one
-				for (var i=0; i<possibilitiesHere.length; i++) {
-					grid.grid[x][y] = possibilitiesHere[i];
-					
-					var result = backtrackingCrossOffSolver.findSolution(grid);
-					if (result.isSolution) {
-						// found a solution on this branch! hurrah!
-						return result;
-					}
-				}
-			} else {
-				// this table is unsolvable since there's a position with no possibilities
-
-				// reset this square so we're back where we started for backtracking
-				grid.grid[x][y] = undefined;
-
-				return {isSolution: false, table: grid}
-		} else {
-			// full grid! done!
+		if (grid.isFull()) {
 			return {isSolution: true, table: grid}
 		}
+		
+		var mostConstrainedPosition = backtrackingCrossOffSolver.getMostContstrainedPosition(grid);
+
+		var x = mostConstrainedPosition.x;
+		var y = mostConstrainedPosition.y;
+
+		// try each of the possible values in this
+		// empty square until we find the correct one
+		for (var i=0; i<mostConstrainedPosition.possibilities.length; i++) {
+			grid.grid[x][y] = mostConstrainedPosition.possibilities[i];
+				
+			var result = backtrackingCrossOffSolver.findSolution(grid);
+			if (result.isSolution) {
+				// found a solution on this branch! hurrah!
+				return result;
+			}
+		}
+
+		// if we get here, this table is unsolvable since
+		// there's a position with no possibilities
+
+		// reset this square so we're back where we started for backtracking
+		grid.grid[x][y] = undefined;
+
+		return {isSolution: false, table: grid};
 	}
 };
 
