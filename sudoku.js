@@ -300,7 +300,7 @@ var backtrackingCrossOffSolver = {
 
 			var possibilitiesHere = possibilitiesInGrid[0].possibilities
 
-			if (possibilitiesHere.length) {
+
 				// iterate over the possibilities until we find the correct one
 				for (var i=0; i<possibilitiesHere.length; i++) {
 					grid.grid[x][y] = possibilitiesHere[i];
@@ -311,7 +311,7 @@ var backtrackingCrossOffSolver = {
 						return result;
 					}
 				}
-			} else {
+
 				// this table is unsolvable since there's a position with no possibilities
 
 				// reset this square so we're back where we started for backtracking
