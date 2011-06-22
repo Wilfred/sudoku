@@ -19,10 +19,23 @@ function arrayContains(value, array) {
 function SudokuGrid() {
 	// create empty grid
 	this.grid = [];
+
+	var column;
 	for (var i=0; i<BOARDSIZE; i++) {
-		this.grid.push([]);
+		column = [];
+		for (var j=0; j<BOARDSIZE; j++) {
+			column.push(undefined);
+		}
+		this.grid.push(column);
 	}
-	
+}
+
+SudokuGrid.prototype.set = function(x, y, value) {
+	this.grid[x][y] = value;
+}
+
+SudokuGrid.prototype.get = function(x, y) {
+	return this.grid[x][y]
 }
 
 SudokuGrid.prototype.getPossibleValues = function() {
@@ -45,8 +58,8 @@ SudokuGrid.prototype.setFromSelector = function(selector) {
 		y = Math.floor(index / BOARDSIZE);
 
 		value = $(element).val()
-		if (value != BLANK) {
-			self.grid[x][y] = parseInt(value, 10);
+		if (value != "") {
+			self.set(x, y, parseInt(value, 10));
 		}
 	});
 };
@@ -62,7 +75,7 @@ SudokuGrid.prototype.setFromString = function(string) {
 		if ($.inArray(value, this.getPossibleValues()) != -1) {
 			x = i % BOARDSIZE;
 			y = Math.floor(i / BOARDSIZE);
-			this.grid[x][y] = value;
+			this.set(x, y, value);
 		}
 	}
 };
@@ -70,7 +83,7 @@ SudokuGrid.prototype.setFromString = function(string) {
 SudokuGrid.prototype.clear = function() {
 	for (var i=0; i<BOARDSIZE; i++) {
 		for (var j=0; j<BOARDSIZE; j++) {
-			this.grid[i][j] = BLANK;
+			this.set(i, j, undefined);
 		}
 	}
 };
@@ -79,17 +92,22 @@ SudokuGrid.prototype.getRow = function(y) {
 	// get row at height y, where 0 is the top
 	var row = [];
 
-	$.each(this.grid, function(index, column) {
-		row.push(column[y]);
-	});
+	for (var i=0; i<BOARDSIZE; i++) {
+		row.push(this.get(i, y));
+	}
 
 	return row;
-	
 };
 
 SudokuGrid.prototype.getColumn = function(x) {
 	// get column which is x across, where 0 is leftmost
-	return this.grid[x]
+	var column = [];
+
+	for (var i=0; i<BOARDSIZE; i++) {
+		column.push(this.get(x, i));
+	}
+
+	return column;
 };
 
 SudokuGrid.prototype.getGroup = function(x, y) {
@@ -100,7 +118,7 @@ SudokuGrid.prototype.getGroup = function(x, y) {
 	var total = 0;
 	for (var i=x*GROUPWIDTH; i<(x+1)*GROUPWIDTH; i++) {
 		for (var j=y*GROUPHEIGHT; j<(y+1)*GROUPHEIGHT; j++) {
-			group.push(this.grid[i][j]);
+			group.push(this.get(i, j));
 		}
 	}
 
@@ -115,7 +133,7 @@ SudokuGrid.prototype.getEmptyPositions = function() {
 	
 	for (var y=0; y<BOARDSIZE; y++) {
 		for (var x=0; x<BOARDSIZE; x++) {
-			if (this.grid[x][y] === undefined) {
+			if (this.get(x, y) === undefined) {
 				emptyPositions.push({x: x, y: y});
 			}
 		}
@@ -128,7 +146,7 @@ SudokuGrid.prototype.isFull = function() {
 	// does every position on this grid have a value?
 	for (var y=0; y<BOARDSIZE; y++) {
 		for (var x=0; x<BOARDSIZE; x++) {
-			if (this.grid[x][y] === undefined) {
+			if (this.get(x, y) === undefined) {
 				return false;
 			}
 		}
@@ -261,10 +279,9 @@ var ui = {
 	setTable: function(table) {
 		$("#sudoku tr").each(function(y, element) {
 			$("td input", $(element)).each(function(x, element) {
-				$(element).val(table.grid[x][y]);
+				$(element).val(table.get(x, y));
 			});
 		});
-		
 	}
 }
 
@@ -316,7 +333,7 @@ var backtrackingCrossOffSolver = {
 		// try each of the possible values in this
 		// empty square until we find the correct one
 		for (var i=0; i<mostConstrainedPosition.possibilities.length; i++) {
-			grid.grid[x][y] = mostConstrainedPosition.possibilities[i];
+			grid.set(x, y, mostConstrainedPosition.possibilities[i]);
 				
 			var result = backtrackingCrossOffSolver.findSolution(grid);
 			if (result.isSolution) {
@@ -329,7 +346,7 @@ var backtrackingCrossOffSolver = {
 		// there's a position with no possibilities
 
 		// reset this square so we're back where we started for backtracking
-		grid.grid[x][y] = undefined;
+		grid.set(x, y, undefined);
 
 		return {isSolution: false, table: grid};
 	}
