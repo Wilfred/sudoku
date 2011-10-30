@@ -142,7 +142,7 @@ table#sudoku {
 	padding: 0;
 }
 
-#sudoku td.user_value input {
+#sudoku td input.user_value {
 	color: #3333AA;
 }
 
