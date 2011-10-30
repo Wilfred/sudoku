@@ -20,18 +20,41 @@ function SudokuGrid() {
 	// create empty grid
 	this.grid = [];
 
-	var column;
-	for (var i=0; i<BOARDSIZE; i++) {
+	var column, i, j;
+	for (i=0; i<BOARDSIZE; i++) {
 		column = [];
-		for (var j=0; j<BOARDSIZE; j++) {
+		for (j=0; j<BOARDSIZE; j++) {
 			column.push(undefined);
 		}
 		this.grid.push(column);
 	}
+
+	// initialise the possibilities grid
+	this.possibilities = [];
+	
+	for (i=0; i<BOARDSIZE; i++) {
+		column = [];
+		for (j=0; j<BOARDSIZE; j++) {
+			column.push(this.getPossibleValues());
+		}
+		this.possibilities.push(column);
+	}
 }
 
 SudokuGrid.prototype.set = function(x, y, value) {
-	this.grid[x][y] = value;
+	if (arrayContains(value, this.possibilities[x][y])) {
+		// this is a legal choice
+		this.grid[x][y] = value;
+
+		// remove this possibility from this row, column and group
+		
+		
+		this.possibilities[x][y] = [];
+	} else {
+		throw {'message': 'Tried to set (' + [x, y] + ') to ' +
+		       value + ' but only allowed ' + this.possibilities[x][y]};
+	}
+
 }
 
 SudokuGrid.prototype.get = function(x, y) {
