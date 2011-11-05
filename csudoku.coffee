@@ -255,9 +255,6 @@ solver =
     # try each of the possible values in this
     # empty square until we find the correct one
     for possibility in mostConstrainedPosition.possibilities
-      previousValue = grid.grid[x][y]
-      previousPossibilites = grid.possibilities[x][y]
-
       grid.set x, y, possibility
 
       result = solver.findSolution grid
@@ -265,13 +262,11 @@ solver =
         # found a solution on this branch! hurrah!
         return result
 
-      # so we reset this square to blank for backtracking
-      grid.grid[x][y] = previousValue
-      grid.possibilities[x][y] = previousPossibilites
-
     # if we get here, this table is now unsolvable since
     # there's a position with no possibilities
 
+    # so we reset this square to blank for backtracking
+    grid.grid[x][y] = undefined
 
     return {isSolution: false, table: grid}
 
