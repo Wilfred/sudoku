@@ -12,7 +12,6 @@ BLANK = ""
 # TODO: make table / grid terminology consistent
 # TODO: make square / position terminology consistent
 # TODO: test / warn when user enters invalid value
-# TODO: move to Twitter bootstrap
 # TODO: add 'unsolvable' / multiple solutions warnings / errors
 
 class SudokuGrid

@@ -8,7 +8,6 @@ port to coffeescript
 add tbody element
 support m x n sudoku
 allow puzzles to be generated of varying difficulty
-simplify CSS (no framework)
 add unit tests (qunit?)
 show solution in a different colour instead of user input
 improve performance, particularly for pathological: ..............3.85..1.2.......5.7.....4...1...9.......5......73..2.1........4...9
