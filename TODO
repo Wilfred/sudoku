@@ -1,22 +1,29 @@
-be consistent with terminology regarding table vs grid
-fix the possibilities/possibleValues confusion
+terminology:
+* be consistent with table vs grid
+* be consisten with square vs position
+
+user aids:
+* show if a puzzle is invalid
+* show if a puzzle is unsolvable
+* show if there are multiple solutions
+
+UI improvements:
+* use setTimeout to keep UI responsive
+* add eggtimer functionality for solving
+
 add puzzle export functionality
 use an explicit blank value in grid
 
-deal with invalid values in table
-port to coffeescript
+stop deeplinking CSS and JS
 add tbody element
 support m x n sudoku
 allow puzzles to be generated of varying difficulty
 add unit tests (qunit?)
-show solution in a different colour instead of user input
 improve performance, particularly for pathological: ..............3.85..1.2.......5.7.....4...1...9.......5......73..2.1........4...9
 (currently 0.914s for test case, 8.4s for pathological on my system)
 
-add eggtimer functionality for solving
-detect when there are multiple solutions
-
 measure whether not having a @get and @set has improved Chrome performance
+also measure whether treating @getColumn differently has improved performance, since it's less readable
 
 better heuristics for performance:
 e.g. detect when other rows already have value X, so this row must have X in this position

@@ -9,11 +9,6 @@ BOARDSIZE = GROUPWIDTH * GROUPHEIGHT
 # (currently this only used in the frontend)
 BLANK = ""
 
-# TODO: make table / grid terminology consistent
-# TODO: make square / position terminology consistent
-# TODO: test / warn when user enters invalid value
-# TODO: add 'unsolvable' / multiple solutions warnings / errors
-
 class SudokuGrid
   constructor: () ->
     # create an empty grid
