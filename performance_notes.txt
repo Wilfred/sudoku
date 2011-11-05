@@ -1,0 +1,13 @@
+commit 756db57, on Firefox
+Chrome is up to 10x faster for pathological!
+
+.......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6...
+
+CS with profiling: 2173 ms
+CS without profiling: 1553 ms
+
+..............3.85..1.2.......5.7.....4...1...9.......5......73..2.1........4...9
+
+CS without profiling: 32150 ms
+Chrome CS: 7721 ms
+Chrome JS: 6700 ms
