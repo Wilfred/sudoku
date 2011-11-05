@@ -22,8 +22,7 @@ class SudokuGrid
       for y in [0...BOARDSIZE]
         undefined
 
-  # get all the legal values for the board
-  getPossibleValues: () -> [1..BOARDSIZE]
+    @legalValues = [1..BOARDSIZE]
 
   setFromSelector: (selector) ->
     # set this grid based on the text inputs in this selector
@@ -42,7 +41,7 @@ class SudokuGrid
       value = parseInt(string.charAt i, 10)
 
       # skip '.'
-      if value in @getPossibleValues()
+      if value in @legalValues
         x = i % BOARDSIZE
         y = Math.floor(i / BOARDSIZE)
         @grid[x][y] = value
@@ -106,7 +105,7 @@ class SudokuGrid
     # on neighbours
     possibilities = []
 
-    for value in @getPossibleValues()
+    for value in @legalValues
       groupX = Math.floor(x / GROUPWIDTH)
       groupY = Math.floor(y / GROUPHEIGHT)
 
