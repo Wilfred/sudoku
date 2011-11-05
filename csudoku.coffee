@@ -112,7 +112,6 @@ class SudokuGrid
     # get all the possible values that can go in this position, based
     # on neighbours
     possibilities = []
-    possibleValues = @getPossibleValues()
 
     for value in @getPossibleValues()
       groupX = Math.floor(x / GROUPWIDTH)
