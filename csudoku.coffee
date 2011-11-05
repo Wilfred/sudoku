@@ -65,6 +65,14 @@ class SudokuGrid
         y = Math.floor(i / BOARDSIZE)
         @set x, y, value
 
+  getAsString: () ->
+    string = ""
+    for x in [0...BOARDSIZE]
+      for y in [0...BOARDSIZE]
+        string = string + @get x, y
+
+    string
+
   clear: () ->
     for i in [0...BOARDSIZE]
       for j in [0...BOARDSIZE]
@@ -204,6 +212,12 @@ ui =
       $("#invalid_table").show()
     else
       $("#invalid_table").hide()
+
+  getTable: () ->
+    grid = new SudokuGrid()
+    grid.setFromSelector $('#sudoku input')
+
+    grid
 
   setTable: (table) ->
     # go over every row
