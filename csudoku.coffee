@@ -22,20 +22,8 @@ class SudokuGrid
       for y in [0...BOARDSIZE]
         undefined
 
-    # initialise the possibilities grid
-    @possibilities = for x in [0...BOARDSIZE]
-      for y in [0...BOARDSIZE]
-        @getPossibleValues()
-
   set: (x, y, value) ->
-    if value in @possibilities[x][y]
-      # this is a legal choice
-      @grid[x][y] = value
-
-      # no longer permitted any other possibilities here
-      @possibilities[x][y] = []
-    else
-      throw {'message': "Tried to set (#{x},#{y}) to #{value} but only allowed #{@possibilities[x][y]}"}
+    @grid[x][y] = value
 
   get: (x, y) ->
     @grid[x][y]
