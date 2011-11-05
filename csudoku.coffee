@@ -275,8 +275,7 @@ init = () ->
   $('button#solve').click ->
     ui.addUserValuesClass()
 
-    currentTable = new SudokuGrid()
-    currentTable.setFromSelector $('#sudoku input')
+    currentTable = ui.getTable()
 
     startTime = new Date().getTime()
 
