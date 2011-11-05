@@ -235,7 +235,7 @@ solver =
         return {x: x, y: y, possibilities: []}
 
       # if this position is more constrained, update mostConstrainedPosition
-      if not mostConstrainedPosition or possibilitiesHere.length < mostConstrainedPosition.length
+      if not mostConstrainedPosition or possibilitiesHere.length < mostConstrainedPosition.possibilities.length
         mostConstrainedPosition = {x: x, y: y, possibilities: possibilitiesHere}
 
     mostConstrainedPosition
