@@ -22,12 +22,6 @@ class SudokuGrid
       for y in [0...BOARDSIZE]
         undefined
 
-  set: (x, y, value) ->
-    @grid[x][y] = value
-
-  get: (x, y) ->
-    @grid[x][y]
-
   # get all the legal values for the board
   getPossibleValues: () -> [1..BOARDSIZE]
 
@@ -39,7 +33,7 @@ class SudokuGrid
 
       value = $(element).val()
       if value != ""
-        @set x, y, parseInt(value, 10)
+        @grid[x][y] = parseInt(value, 10)
 
   setFromString: (string) ->
     # set this table based on a string of characters specifying it
@@ -51,30 +45,29 @@ class SudokuGrid
       if value in @getPossibleValues()
         x = i % BOARDSIZE
         y = Math.floor(i / BOARDSIZE)
-        @set x, y, value
+        @grid[x][y] = value
 
   getAsString: () ->
     string = ""
     for x in [0...BOARDSIZE]
       for y in [0...BOARDSIZE]
-        string = string + @get x, y
+        string = string + @grid[x][y]
 
     string
 
   clear: () ->
     for i in [0...BOARDSIZE]
       for j in [0...BOARDSIZE]
-        @set(i, j, undefined)
+        @grid[i][j] = undefined
 
   getRow: (y) ->
     # get row at height y, where 0 is the top
     for i in [0...BOARDSIZE]
-      @get i, y
+      @grid[i][y]
 
   getColumn: (x) ->
     # get column which is x across, where 0 is leftmost
-    for i in [0...BOARDSIZE]
-      @get x, i
+    @grid[x]
 
   getGroup: (x, y) ->
     # get the group which is x groups across and y groups down
@@ -82,7 +75,7 @@ class SudokuGrid
     group = []
     for i in [x * GROUPWIDTH...(x+1) * GROUPWIDTH]
       for j in [y * GROUPHEIGHT...(y+1) * GROUPHEIGHT]
-        group.push(@get i, j)
+        group.push(@grid[i][j])
 
     group
 
@@ -94,7 +87,7 @@ class SudokuGrid
 
     for y in [0...BOARDSIZE]
       for x in [0...BOARDSIZE]
-        if @get(x, y) == undefined
+        if @grid[x][y] == undefined
           emptyPositions.push {x, y}
 
     emptyPositions
@@ -103,7 +96,7 @@ class SudokuGrid
     # does every position on this grid have a value?
     for x in [0...BOARDSIZE]
       for y in [0...BOARDSIZE]
-        if @get(x, y) == undefined
+        if @grid[x][y] == undefined
           return false
 
     true
@@ -212,7 +205,7 @@ ui =
       # then go over ever input in that row
       $("input", $(element)).each (x, element) ->
         # set this input to the table value at this point
-        $(element).val(table.get x, y)
+        $(element).val(table.grid[x][y])
 
 # we solve using a backtracking cross-off algorithm
 solver =
@@ -255,7 +248,7 @@ solver =
     # try each of the possible values in this
     # empty square until we find the correct one
     for possibility in mostConstrainedPosition.possibilities
-      grid.set x, y, possibility
+      grid.grid[x][y] = possibility
 
       result = solver.findSolution grid
       if result.isSolution
