@@ -59,7 +59,7 @@
       string = "";
       for (x = 0; 0 <= BOARDSIZE ? x < BOARDSIZE : x > BOARDSIZE; 0 <= BOARDSIZE ? x++ : x--) {
         for (y = 0; 0 <= BOARDSIZE ? y < BOARDSIZE : y > BOARDSIZE; 0 <= BOARDSIZE ? y++ : y--) {
-          string = string + this.grid[x][y];
+          string = string + (this.grid[x][y] || ".");
         }
       }
       return string;
@@ -307,6 +307,9 @@
       table.setFromString(puzzleString);
       ui.setTable(table);
       return ui.checkTableIsValid();
+    });
+    $('button#export_puzzle').click(function() {
+      return alert(ui.getTable().getAsString());
     });
     return $("#sudoku input").keyup(function() {
       return ui.checkTableIsValid();

@@ -44,7 +44,7 @@ class SudokuGrid
     string = ""
     for x in [0...BOARDSIZE]
       for y in [0...BOARDSIZE]
-        string = string + @grid[x][y]
+        string = string + (@grid[x][y] or ".")
 
     string
 
@@ -288,6 +288,9 @@ init = () ->
     table.setFromString(puzzleString)
     ui.setTable(table)
     ui.checkTableIsValid()
+
+  $('button#export_puzzle').click ->
+    alert ui.getTable().getAsString()
 
   # monitor table for changes, and warn immediately if the grid is invalid
   $("#sudoku input").keyup ->

@@ -10,8 +10,8 @@ user aids:
 UI improvements:
 * use setTimeout to keep UI responsive
 * add eggtimer functionality for solving
+* use a bootstrap alert for export rather than alert()
 
-add puzzle export functionality
 use an explicit blank value in grid
 
 stop deeplinking CSS and JS
