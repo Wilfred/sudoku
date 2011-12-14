@@ -1,25 +1,38 @@
-# TODO: pass these to the grid, so it handles any size grid
+# # Sudoku Solver
+#
+# A sudoku solver that solves abitrary size grids using a simple
+# backtracking algorithm.
+
+# Grid dimensions. The solver itself can handle a grid of any size,
+# but currently this isn't exposed in the UI. As a result, dimensions
+# are currently set as constants.
+#
+# The grid is made up of groups which are rectangular, although the
+# overall grid is always square.
 GROUPWIDTH = 3;
 GROUPHEIGHT = 3;
-
-# board height = board width, since a sudoku board is square
 BOARDSIZE = GROUPWIDTH * GROUPHEIGHT
 
 # TODO: move away from undefined to this for consistency
 # (currently this only used in the frontend)
 BLANK = ""
 
+# The Sudoku model. The grid itself is a 2D array, so it can be
+# accessed with `@grid[x][y]`. Previously there were `@get` and `@set`
+# methods, but profiling suggested they were affecting
+# performance. Further benchmarking is needed, particulary after more
+# heuristics are added.
 class SudokuGrid
+  # Create an empty grid.
   constructor: () ->
-    # create an empty grid
     @grid = for x in [0...BOARDSIZE]
       for y in [0...BOARDSIZE]
         undefined
 
     @legalValues = [1..BOARDSIZE]
 
+  # Set this grid based on the text inputs in this selector
   setFromSelector: (selector) ->
-    # set this grid based on the text inputs in this selector
     selector.each (index, element) =>
       x = index % BOARDSIZE
       y = Math.floor(index / BOARDSIZE)
@@ -28,9 +41,10 @@ class SudokuGrid
       if value != ""
         @grid[x][y] = parseInt(value, 10)
 
+  # Set this table based on a string of characters specifying it
+  #
+  # e.g. `".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."`
   setFromString: (string) ->
-    # set this table based on a string of characters specifying it
-    # e.g. ".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."
     for i in [0...string.length]
       value = parseInt(string.charAt i, 10)
 
@@ -40,6 +54,7 @@ class SudokuGrid
         y = Math.floor(i / BOARDSIZE)
         @grid[x][y] = value
 
+  # Get a string of the current grid values, in the same format as `setFromString`.
   getAsString: () ->
     string = ""
     for x in [0...BOARDSIZE]
@@ -53,18 +68,18 @@ class SudokuGrid
       for j in [0...BOARDSIZE]
         @grid[i][j] = undefined
 
+  # Get row at height `y`, where 0 is the top.
   getRow: (y) ->
-    # get row at height y, where 0 is the top
     for i in [0...BOARDSIZE]
       @grid[i][y]
 
+  # Get column which is `x` across, where 0 is leftmost.
   getColumn: (x) ->
-    # get column which is x across, where 0 is leftmost
     @grid[x]
 
+  # Get the group which is `x` groups across and `y` groups down,
+  # returning a 1-D array.
   getGroup: (x, y) ->
-    # get the group which is x groups across and y groups down
-    # returning a 1-D array
     group = []
     for i in [x * GROUPWIDTH...(x+1) * GROUPWIDTH]
       for j in [y * GROUPHEIGHT...(y+1) * GROUPHEIGHT]
@@ -72,10 +87,10 @@ class SudokuGrid
 
     group
 
+  # Get an array of co-ordinates of all the blank squares. We
+  # deliberately iterate over `x` in the inner loop, as it produces
+  # more attractive results when 'solving' an empty grid.
   getEmptyPositions: () ->
-    # get an array of co-ordinates of all the blank squares
-    # deliberately iterating over x in the inner loop as it often
-    # produces more attractive (IMHO) results
     emptyPositions = []
 
     for y in [0...BOARDSIZE]
@@ -85,8 +100,8 @@ class SudokuGrid
 
     emptyPositions
 
+  # Does every position on this grid have a value?
   isFull: () ->
-    # does every position on this grid have a value?
     for x in [0...BOARDSIZE]
       for y in [0...BOARDSIZE]
         if @grid[x][y] == undefined
@@ -94,9 +109,9 @@ class SudokuGrid
 
     true
 
+  # Get all the possible values that can go in this position, based
+  # on neighbours.
   getPossibilities: (x, y) ->
-    # get all the possible values that can go in this position, based
-    # on neighbours
     possibilities = []
 
     for value in @legalValues
@@ -110,9 +125,9 @@ class SudokuGrid
 
     possibilities
 
+  # Check that a given array contains no duplicates
+  # (other than empty regions).
   isRegionValid: (region) ->
-    # check that a given array contains no duplicates
-    # (other than empty regions)
     seenSoFar = {}
 
     for value in region
@@ -126,26 +141,26 @@ class SudokuGrid
 
     return true
 
+  # Could this table be a valid solution, or part of
+  # one? We tolerate blanks.
+  #
+  # Note that we only check for obvious errors in a row, column
+  # or group, so it is still possible for an invalid grid to
+  # return true here.
   isValid: () ->
-    # could this table be a valid solution, or part of
-    # one? We tolerate blanks
-
-    # note that we only check for obvious errors in a row, column
-    # or group, so it is still possible for an invalid grid to
-    # return true here
-
-    # check rows
+    # Check rows.
     for i in [0...BOARDSIZE]
       row = @getRow i
       if not @isRegionValid row
         return false
 
-    # check columns
+    # Check columns.
     for j in [0...BOARDSIZE]
       column = @getColumn j
       if not @isRegionValid column
         return false
 
+    # Check groups.
     for i in [0...GROUPWIDTH]
       for j in [0...GROUPWIDTH]
         group = @getGroup i, j
@@ -155,26 +170,24 @@ class SudokuGrid
 
     return true
 
-# ui utilities are in a separate namespace
+# ## UI utilities
 ui =
+  # Set the table in the DOM to be blank.
   clearTable: () ->
-    # set the table in the DOM to be blank
     ui.removeUserValuesClass()
-    # TODO: this should be wrapped into a function:
     $("#invalid_table").hide()
 
     blankTable = new SudokuGrid()
     ui.setTable blankTable
 
+  # Add an additional class to user-provided cells, so
+  # we can style them differently.
   addUserValuesClass: () ->
-    # add an additional class to user-provided cells, so
-    # we can style them differently
-
-    # user's input is the non-empty cells
+    # the user's input is the non-empty cells
     $("#sudoku td input[value!='']").addClass "user_value"
 
+  # Undoes `addUserValuesClass`.
   removeUserValuesClass: () ->
-    # undoes addUserValuesClass
     $(".user_value").removeClass "user_value"
 
   checkTableIsValid: () ->
@@ -200,12 +213,14 @@ ui =
         # set this input to the table value at this point
         $(element).val(table.grid[x][y])
 
-# we solve using a backtracking cross-off algorithm
+# ## Solver
+# Our solver uses a backtracking cross-off algorithm.
 solver =
+  # Given a sudoku grid, find the position with the fewest possibilities.
+  #
+  # Note that an invalid grid has positions with no possibilities.
   getMostContstrainedPosition: (grid) ->
-    # given a sudoku grid, find the position with the fewest possibilities
-    # note that an invalid grid has positions with no possibilities
-    # {x: 1, y: 0, possibilities: [2,3,6]}
+    # Takes the format: {x: 1, y: 0, possibilities: [2,3,6]}
     emptyPositions = grid.getEmptyPositions()
 
     mostConstrainedPosition = null
@@ -217,19 +232,19 @@ solver =
       possibilitiesHere = grid.getPossibilities x, y
 
       if possibilitiesHere.length == 0
-        # we will never find a more constrained position, so terminate early
+        # We will never find a more constrained position, so terminate early.
         return {x: x, y: y, possibilities: []}
 
-      # if this position is more constrained, update mostConstrainedPosition
+      # If this position is more constrained, update mostConstrainedPosition.
       if not mostConstrainedPosition or possibilitiesHere.length < mostConstrainedPosition.possibilities.length
         mostConstrainedPosition = {x: x, y: y, possibilities: possibilitiesHere}
 
     mostConstrainedPosition
 
+  # Given a sudoku grid, find a soution with a backtracking
+  # brute-force algorithm, starting with the most constrained
+  # positions.
   findSolution: (grid) ->
-    # given a sudoku grid, use a backtracking brute-force
-    # algorithm, starting with the most constrained
-    # positions
     if grid.isFull()
       return {isSolution: true, table: grid}
 
@@ -238,26 +253,25 @@ solver =
     x = mostConstrainedPosition.x
     y = mostConstrainedPosition.y
 
-    # try each of the possible values in this
-    # empty square until we find the correct one
+    # Try each of the possible values in this empty square until we
+    # find the correct one.
     for possibility in mostConstrainedPosition.possibilities
       grid.grid[x][y] = possibility
 
       result = solver.findSolution grid
       if result.isSolution
-        # found a solution on this branch! hurrah!
+        # Found a solution on this branch! hurrah!
         return result
 
-    # if we get here, this table is now unsolvable since
-    # there's a position with no possibilities
-
-    # so we reset this square to blank for backtracking
+    # If we get here, this table is now unsolvable since
+    # there's a position with no possibilities.
+    # So we reset this square to blank for backtracking.
     grid.grid[x][y] = undefined
 
     return {isSolution: false, table: grid}
 
 init = () ->
-  # todo: this ought to be wrapped in a named function
+
   $('button#solve').click ->
     ui.addUserValuesClass()
 
@@ -292,12 +306,14 @@ init = () ->
   $('button#export_puzzle').click ->
     alert ui.getTable().getAsString()
 
-  # monitor table for changes, and warn immediately if the grid is invalid
+  # Monitor table for changes, and warn immediately if the grid is invalid.
   $("#sudoku input").keyup ->
     ui.checkTableIsValid()
 
 init()
 
+# We attach our objects to the global object so it's easy to fiddle
+# with things in the browser console.
 window.ui = ui
 window.solver = solver
 window.SudokuGrid = SudokuGrid
