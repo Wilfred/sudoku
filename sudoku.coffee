@@ -220,12 +220,9 @@ solver =
   #
   # Note that an invalid grid has positions with no possibilities.
   getMostContstrainedPosition: (grid) ->
-    # Takes the format: {x: 1, y: 0, possibilities: [2,3,6]}
-    emptyPositions = grid.getEmptyPositions()
-
     mostConstrainedPosition = null
 
-    for {x: x, y: y} in emptyPositions
+    for {x: x, y: y} in grid.getEmptyPositions()
       possibilitiesHere = grid.getPossibilities x, y
 
       if possibilitiesHere.length == 0
@@ -245,14 +242,11 @@ solver =
     if grid.isFull()
       return {isSolution: true, table: grid}
 
-    mostConstrainedPosition = solver.getMostContstrainedPosition grid
-
-    x = mostConstrainedPosition.x
-    y = mostConstrainedPosition.y
+    {x: x, y: y, possibilities: possibilities} = solver.getMostContstrainedPosition grid
 
     # Try each of the possible values in this empty square until we
     # find the correct one.
-    for possibility in mostConstrainedPosition.possibilities
+    for possibility in possibilities
       grid.grid[x][y] = possibility
 
       result = solver.findSolution grid

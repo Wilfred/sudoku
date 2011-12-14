@@ -226,11 +226,11 @@
   };
   solver = {
     getMostContstrainedPosition: function(grid) {
-      var emptyPositions, mostConstrainedPosition, possibilitiesHere, x, y, _i, _len, _ref;
-      emptyPositions = grid.getEmptyPositions();
+      var mostConstrainedPosition, possibilitiesHere, x, y, _i, _len, _ref, _ref2;
       mostConstrainedPosition = null;
-      for (_i = 0, _len = emptyPositions.length; _i < _len; _i++) {
-        _ref = emptyPositions[_i], x = _ref[0], y = _ref[1];
+      _ref = grid.getEmptyPositions();
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        _ref2 = _ref[_i], x = _ref2.x, y = _ref2.y;
         possibilitiesHere = grid.getPossibilities(x, y);
         if (possibilitiesHere.length === 0) {
           return {
@@ -250,19 +250,16 @@
       return mostConstrainedPosition;
     },
     findSolution: function(grid) {
-      var mostConstrainedPosition, possibility, result, x, y, _i, _len, _ref;
+      var possibilities, possibility, result, x, y, _i, _len, _ref;
       if (grid.isFull()) {
         return {
           isSolution: true,
           table: grid
         };
       }
-      mostConstrainedPosition = solver.getMostContstrainedPosition(grid);
-      x = mostConstrainedPosition.x;
-      y = mostConstrainedPosition.y;
-      _ref = mostConstrainedPosition.possibilities;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        possibility = _ref[_i];
+      _ref = solver.getMostContstrainedPosition(grid), x = _ref.x, y = _ref.y, possibilities = _ref.possibilities;
+      for (_i = 0, _len = possibilities.length; _i < _len; _i++) {
+        possibility = possibilities[_i];
         grid.grid[x][y] = possibility;
         result = solver.findSolution(grid);
         if (result.isSolution) {
