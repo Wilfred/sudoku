@@ -226,13 +226,11 @@
   };
   solver = {
     getMostContstrainedPosition: function(grid) {
-      var emptyPositions, mostConstrainedPosition, position, possibilitiesHere, x, y, _i, _len;
+      var emptyPositions, mostConstrainedPosition, possibilitiesHere, x, y, _i, _len, _ref;
       emptyPositions = grid.getEmptyPositions();
       mostConstrainedPosition = null;
       for (_i = 0, _len = emptyPositions.length; _i < _len; _i++) {
-        position = emptyPositions[_i];
-        x = position.x;
-        y = position.y;
+        _ref = emptyPositions[_i], x = _ref[0], y = _ref[1];
         possibilitiesHere = grid.getPossibilities(x, y);
         if (possibilitiesHere.length === 0) {
           return {
