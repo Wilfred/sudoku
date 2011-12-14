@@ -225,7 +225,7 @@ solver =
 
     mostConstrainedPosition = null
 
-    for [x, y] in emptyPositions
+    for {x: x, y: y} in emptyPositions
       possibilitiesHere = grid.getPossibilities x, y
 
       if possibilitiesHere.length == 0
