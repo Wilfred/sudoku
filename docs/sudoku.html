@@ -1,212 +1,779 @@
-<!DOCTYPE html>  <html> <head>   <title>sudoku.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               sudoku.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h1>Sudoku Solver</h1>
+<!DOCTYPE html>
 
+<html>
+<head>
+  <title>Sudoku Solver</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1>Sudoku Solver</h1>
 <p>A sudoku solver that solves abitrary size grids using a simple
-backtracking algorithm.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Grid dimensions. The solver itself can handle a grid of any size,
-but currently this isn't exposed in the UI. As a result, dimensions
+backtracking algorithm.</p>
+<p>Grid dimensions. The solver itself can handle a grid of any size,
+but currently this isn&#39;t exposed in the UI. As a result, dimensions
 are currently set as constants.</p>
-
 <p>The grid is made up of groups which are rectangular, although the
-overall grid is always square.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">GROUPWIDTH = </span><span class="mi">3</span><span class="p">;</span>
-<span class="nv">GROUPHEIGHT = </span><span class="mi">3</span><span class="p">;</span>
-<span class="nv">BOARDSIZE = </span><span class="nx">GROUPWIDTH</span> <span class="o">*</span> <span class="nx">GROUPHEIGHT</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>TODO: move away from undefined to this for consistency
-(currently this only used in the frontend)</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">BLANK = </span><span class="s">&quot;&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>The Sudoku model. The grid itself is a 2D array, so it can be
+overall grid is always square.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>GROUPWIDTH = <span class="number">3</span>;
+GROUPHEIGHT = <span class="number">3</span>;
+BOARDSIZE = GROUPWIDTH * GROUPHEIGHT</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>TODO: move away from undefined to this for consistency
+(currently this only used in the frontend)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>BLANK = <span class="string">""</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>The Sudoku model. The grid itself is a 2D array, so it can be
 accessed with <code>@grid[x][y]</code>. Previously there were <code>@get</code> and <code>@set</code>
 methods, but profiling suggested they were affecting
 performance. Further benchmarking is needed, particulary after more
-heuristics are added.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">SudokuGrid</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Create an empty grid.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">constructor: </span><span class="nf">() -&gt;</span>
-    <span class="vi">@grid = </span><span class="k">for</span> <span class="nx">x</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">y</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-        <span class="kc">undefined</span>
+heuristics are added.</p>
 
-    <span class="vi">@legalValues = </span><span class="p">[</span><span class="mi">1</span><span class="p">..</span><span class="nx">BOARDSIZE</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Set this grid based on the text inputs in this selector</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">setFromSelector: </span><span class="nf">(selector) -&gt;</span>
-    <span class="nx">selector</span><span class="p">.</span><span class="nx">each</span> <span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="o">=&gt;</span>
-      <span class="nv">x = </span><span class="nx">index</span> <span class="o">%</span> <span class="nx">BOARDSIZE</span>
-      <span class="nv">y = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">index</span> <span class="o">/</span> <span class="nx">BOARDSIZE</span><span class="p">)</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="class"><span class="keyword">class</span> <span class="title">SudokuGrid</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Create an empty grid.</p>
 
-      <span class="nv">value = </span><span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
-      <span class="k">if</span> <span class="nx">value</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span>
-        <span class="nx">@grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Set this table based on a string of characters specifying it</p>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor: () -&gt;
+    <span class="property">@grid</span> = <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+        <span class="literal">undefined</span>
 
-<p>e.g. <code>".......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6..."</code></p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">setFromString: </span><span class="nf">(string) -&gt;</span>
-    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">string</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span>
-      <span class="nv">value = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">string</span><span class="p">.</span><span class="nx">charAt</span> <span class="nx">i</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>skip '.'</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">if</span> <span class="nx">value</span> <span class="k">in</span> <span class="nx">@legalValues</span>
-        <span class="nv">x = </span><span class="nx">i</span> <span class="o">%</span> <span class="nx">BOARDSIZE</span>
-        <span class="nv">y = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">i</span> <span class="o">/</span> <span class="nx">BOARDSIZE</span><span class="p">)</span>
-        <span class="nx">@grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Get a string of the current grid values, in the same format as <code>setFromString</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getAsString: </span><span class="nf">() -&gt;</span>
-    <span class="nv">string = </span><span class="s">&quot;&quot;</span>
-    <span class="k">for</span> <span class="nx">x</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">y</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-        <span class="nv">string = </span><span class="nx">string</span> <span class="o">+</span> <span class="p">(</span><span class="nx">@grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">or</span> <span class="s">&quot;.&quot;</span><span class="p">)</span>
+    <span class="property">@legalValues</span> = [<span class="number">1.</span>.BOARDSIZE]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Set this grid based on the text inputs in this selector</p>
 
-    <span class="nx">string</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  setFromSelector: (selector) -&gt;
+    selector.each (index, element) =&gt;
+      x = index % BOARDSIZE
+      y = Math.floor(index / BOARDSIZE)
 
-  <span class="nv">clear: </span><span class="nf">() -&gt;</span>
-    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-        <span class="nx">@grid</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="kc">undefined</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Get row at height <code>y</code>, where 0 is the top.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getRow: </span><span class="nf">(y) -&gt;</span>
-    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="nx">@grid</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>Get column which is <code>x</code> across, where 0 is leftmost.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getColumn: </span><span class="nf">(x) -&gt;</span>
-    <span class="nx">@grid</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Get the group which is <code>x</code> groups across and <code>y</code> groups down,
-returning a 1-D array.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getGroup: </span><span class="nf">(x, y) -&gt;</span>
-    <span class="nv">group = </span><span class="p">[]</span>
-    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="nx">x</span> <span class="o">*</span> <span class="nx">GROUPWIDTH</span><span class="p">...(</span><span class="nx">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">GROUPWIDTH</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="nx">y</span> <span class="o">*</span> <span class="nx">GROUPHEIGHT</span><span class="p">...(</span><span class="nx">y</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">GROUPHEIGHT</span><span class="p">]</span>
-        <span class="nx">group</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">@grid</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">j</span><span class="p">])</span>
+      value = $(element).val()
+      <span class="keyword">if</span> value != <span class="string">""</span>
+        <span class="property">@grid</span>[x][y] = parseInt(value, <span class="number">10</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Set this table based on a string of characters specifying it</p>
+<p>e.g. <code>&quot;.......12........3..23..4....18....5.6..7.8.......9.....85.....9...4.5..47...6...&quot;</code></p>
 
-    <span class="nx">group</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>Get an array of co-ordinates of all the blank squares. We
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  setFromString: (string) -&gt;
+    <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..string.length]
+      value = parseInt(string.charAt i, <span class="number">10</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>skip &#39;.&#39;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> value <span class="keyword">in</span> <span class="property">@legalValues</span>
+        x = i % BOARDSIZE
+        y = Math.floor(i / BOARDSIZE)
+        <span class="property">@grid</span>[x][y] = value</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Get a string of the current grid values, in the same format as <code>setFromString</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getAsString: () -&gt;
+    string = <span class="string">""</span>
+    <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+        string = string + (<span class="property">@grid</span>[x][y] <span class="keyword">or</span> <span class="string">"."</span>)
+
+    string
+
+  clear: () -&gt;
+    <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      <span class="keyword">for</span> j <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+        <span class="property">@grid</span>[i][j] = <span class="literal">undefined</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Get row at height <code>y</code>, where 0 is the top.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getRow: (y) -&gt;
+    <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      <span class="property">@grid</span>[i][y]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Get column which is <code>x</code> across, where 0 is leftmost.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getColumn: (x) -&gt;
+    <span class="property">@grid</span>[x]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Get the group which is <code>x</code> groups across and <code>y</code> groups down,
+returning a 1-D array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getGroup: (x, y) -&gt;
+    group = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> [x * GROUPWIDTH...(x+<span class="number">1</span>) * GROUPWIDTH]
+      <span class="keyword">for</span> j <span class="keyword">in</span> [y * GROUPHEIGHT...(y+<span class="number">1</span>) * GROUPHEIGHT]
+        group.push(<span class="property">@grid</span>[i][j])
+
+    group</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Get an array of co-ordinates of all the blank squares. We
 deliberately iterate over <code>x</code> in the inner loop, as it produces
-more attractive results when 'solving' an empty grid.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getEmptyPositions: </span><span class="nf">() -&gt;</span>
-    <span class="nv">emptyPositions = </span><span class="p">[]</span>
+more attractive results when &#39;solving&#39; an empty grid.</p>
 
-    <span class="k">for</span> <span class="nx">y</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">x</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nx">@grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">==</span> <span class="kc">undefined</span>
-          <span class="nx">emptyPositions</span><span class="p">.</span><span class="nx">push</span> <span class="p">{</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">}</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getEmptyPositions: () -&gt;
+    emptyPositions = []
 
-    <span class="nx">emptyPositions</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>Does every position on this grid have a value?</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">isFull: </span><span class="nf">() -&gt;</span>
-    <span class="k">for</span> <span class="nx">x</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">y</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nx">@grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">==</span> <span class="kc">undefined</span>
-          <span class="k">return</span> <span class="kc">false</span>
+    <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+        <span class="keyword">if</span> <span class="property">@grid</span>[x][y] == <span class="literal">undefined</span>
+          emptyPositions.push {x, y}
 
-    <span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <p>Get all the possible values that can go in this position, based
-on neighbours.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getPossibilities: </span><span class="nf">(x, y) -&gt;</span>
-    <span class="nv">possibilities = </span><span class="p">[]</span>
+    emptyPositions</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Does every position on this grid have a value?</p>
 
-    <span class="k">for</span> <span class="nx">value</span> <span class="k">in</span> <span class="nx">@legalValues</span>
-      <span class="nv">groupX = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">x</span> <span class="o">/</span> <span class="nx">GROUPWIDTH</span><span class="p">)</span>
-      <span class="nv">groupY = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">y</span> <span class="o">/</span> <span class="nx">GROUPHEIGHT</span><span class="p">)</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  isFull: () -&gt;
+    <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+        <span class="keyword">if</span> <span class="property">@grid</span>[x][y] == <span class="literal">undefined</span>
+          <span class="keyword">return</span> <span class="literal">false</span>
 
-      <span class="k">if</span> <span class="nx">value</span> <span class="o">not</span> <span class="k">in</span> <span class="nx">@getRow</span><span class="p">(</span><span class="nx">y</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nx">value</span> <span class="o">not</span> <span class="k">in</span> <span class="nx">@getColumn</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
-          <span class="k">if</span> <span class="nx">value</span> <span class="o">not</span> <span class="k">in</span> <span class="nx">@getGroup</span><span class="p">(</span><span class="nx">groupX</span><span class="p">,</span> <span class="nx">groupY</span><span class="p">)</span>
-            <span class="nx">possibilities</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
+    <span class="literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Get all the possible values that can go in this position, based
+on neighbours.</p>
 
-    <span class="nx">possibilities</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <p>Check that a given array contains no duplicates
-(other than empty regions).</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">isRegionValid: </span><span class="nf">(region) -&gt;</span>
-    <span class="nv">seenSoFar = </span><span class="p">{}</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getPossibilities: (x, y) -&gt;
+    possibilities = []
 
-    <span class="k">for</span> <span class="nx">value</span> <span class="k">in</span> <span class="nx">region</span>
-      <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="kc">undefined</span>
-        <span class="k">continue</span>
+    <span class="keyword">for</span> value <span class="keyword">in</span> <span class="property">@legalValues</span>
+      groupX = Math.floor(x / GROUPWIDTH)
+      groupY = Math.floor(y / GROUPHEIGHT)
 
-      <span class="k">if</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">seenSoFar</span>
-        <span class="k">return</span> <span class="kc">false</span>
-      <span class="k">else</span>
-        <span class="nx">seenSoFar</span><span class="p">[</span><span class="nx">value</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
+      <span class="keyword">if</span> value <span class="keyword">not</span> <span class="keyword">in</span> <span class="property">@getRow</span>(y)
+        <span class="keyword">if</span> value <span class="keyword">not</span> <span class="keyword">in</span> <span class="property">@getColumn</span>(x)
+          <span class="keyword">if</span> value <span class="keyword">not</span> <span class="keyword">in</span> <span class="property">@getGroup</span>(groupX, groupY)
+            possibilities.push(value)
 
-    <span class="k">return</span> <span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <p>Could this table be a valid solution, or part of
+    possibilities</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Check that a given array contains no duplicates
+(other than empty regions).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  isRegionValid: (region) -&gt;
+    seenSoFar = {}
+
+    <span class="keyword">for</span> value <span class="keyword">in</span> region
+      <span class="keyword">if</span> value == <span class="literal">undefined</span>
+        <span class="keyword">continue</span>
+
+      <span class="keyword">if</span> value <span class="keyword">of</span> seenSoFar
+        <span class="keyword">return</span> <span class="literal">false</span>
+      <span class="keyword">else</span>
+        seenSoFar[value] = <span class="literal">true</span>
+
+    <span class="keyword">return</span> <span class="literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Could this table be a valid solution, or part of
 one? We tolerate blanks.</p>
-
 <p>Note that we only check for obvious errors in a row, column
 or group, so it is still possible for an invalid grid to
-return true here.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">isValid: </span><span class="nf">() -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <p>Check rows.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="nv">row = </span><span class="nx">@getRow</span> <span class="nx">i</span>
-      <span class="k">if</span> <span class="o">not</span> <span class="nx">@isRegionValid</span> <span class="nx">row</span>
-        <span class="k">return</span> <span class="kc">false</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <p>Check columns.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">BOARDSIZE</span><span class="p">]</span>
-      <span class="nv">column = </span><span class="nx">@getColumn</span> <span class="nx">j</span>
-      <span class="k">if</span> <span class="o">not</span> <span class="nx">@isRegionValid</span> <span class="nx">column</span>
-        <span class="k">return</span> <span class="kc">false</span></pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <p>Check groups.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">GROUPWIDTH</span><span class="p">]</span>
-      <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">GROUPWIDTH</span><span class="p">]</span>
-        <span class="nv">group = </span><span class="nx">@getGroup</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">j</span>
+return true here.</p>
 
-        <span class="k">if</span> <span class="o">not</span> <span class="nx">@isRegionValid</span> <span class="nx">group</span>
-          <span class="k">return</span> <span class="kc">false</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  isValid: () -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Check rows.</p>
 
-    <span class="k">return</span> <span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-21">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-21">&#182;</a>               </div>               <h2>UI utilities</h2>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">ui =</span></pre></div>             </td>           </tr>                               <tr id="section-22">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-22">&#182;</a>               </div>               <p>Set the table in the DOM to be blank.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">clearTable: </span><span class="nf">() -&gt;</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">removeUserValuesClass</span><span class="p">()</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">invalid_table&quot;</span><span class="p">).</span><span class="nx">hide</span><span class="p">()</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      row = <span class="property">@getRow</span> i
+      <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@isRegionValid</span> row
+        <span class="keyword">return</span> <span class="literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Check columns.</p>
 
-    <span class="nv">blankTable = </span><span class="k">new</span> <span class="nx">SudokuGrid</span><span class="p">()</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">setTable</span> <span class="nx">blankTable</span></pre></div>             </td>           </tr>                               <tr id="section-23">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-23">&#182;</a>               </div>               <p>Add an additional class to user-provided cells, so
-we can style them differently.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">addUserValuesClass: </span><span class="nf">() -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-24">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-24">&#182;</a>               </div>               <p>the user's input is the non-empty cells</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">sudoku td input[value!=&#39;&#39;]&quot;</span><span class="p">).</span><span class="nx">addClass</span> <span class="s">&quot;user_value&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-25">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-25">&#182;</a>               </div>               <p>Undoes <code>addUserValuesClass</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">removeUserValuesClass: </span><span class="nf">() -&gt;</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;.user_value&quot;</span><span class="p">).</span><span class="nx">removeClass</span> <span class="s">&quot;user_value&quot;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> j <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
+      column = <span class="property">@getColumn</span> j
+      <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@isRegionValid</span> column
+        <span class="keyword">return</span> <span class="literal">false</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Check groups.</p>
 
-  <span class="nv">checkTableIsValid: </span><span class="nf">() -&gt;</span>
-    <span class="nv">currentTable = </span><span class="k">new</span> <span class="nx">SudokuGrid</span><span class="p">()</span>
-    <span class="nx">currentTable</span><span class="p">.</span><span class="nx">setFromSelector</span> <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">sudoku input&quot;</span><span class="p">)</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..GROUPWIDTH]
+      <span class="keyword">for</span> j <span class="keyword">in</span> [<span class="number">0.</span>..GROUPWIDTH]
+        group = <span class="property">@getGroup</span> i, j
 
-    <span class="k">if</span> <span class="o">not</span> <span class="nx">currentTable</span><span class="p">.</span><span class="nx">isValid</span><span class="p">()</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">invalid_table&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">()</span>
-    <span class="k">else</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">invalid_table&quot;</span><span class="p">).</span><span class="nx">hide</span><span class="p">()</span>
+        <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@isRegionValid</span> group
+          <span class="keyword">return</span> <span class="literal">false</span>
 
-  <span class="nv">getTable: </span><span class="nf">() -&gt;</span>
-    <span class="nv">grid = </span><span class="k">new</span> <span class="nx">SudokuGrid</span><span class="p">()</span>
-    <span class="nx">grid</span><span class="p">.</span><span class="nx">setFromSelector</span> <span class="nx">$</span><span class="p">(</span><span class="s">&#39;#sudoku input&#39;</span><span class="p">)</span>
+    <span class="keyword">return</span> <span class="literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h2>UI utilities</h2>
 
-    <span class="nx">grid</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>ui =</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Set the table in the DOM to be blank.</p>
 
-  <span class="nv">setTable: </span><span class="nf">(table) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-26">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-26">&#182;</a>               </div>               <p>go over every row</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">sudoku tr&quot;</span><span class="p">).</span><span class="nx">each</span> <span class="nf">(y, element) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-27">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-27">&#182;</a>               </div>               <p>then go over ever input in that row</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">$</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">,</span> <span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">)).</span><span class="nx">each</span> <span class="nf">(x, element) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-28">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-28">&#182;</a>               </div>               <p>set this input to the table value at this point</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">$</span><span class="p">(</span><span class="nx">element</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nx">table</span><span class="p">.</span><span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-29">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>               <h2>Solver</h2>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  clearTable: () -&gt;
+    ui.removeUserValuesClass()
+    $(<span class="string">"#invalid_table"</span>).hide()
 
-<p>Our solver uses a backtracking cross-off algorithm.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">solver =</span></pre></div>             </td>           </tr>                               <tr id="section-30">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-30">&#182;</a>               </div>               <p>Given a sudoku grid, find the position with the fewest possibilities.</p>
+    blankTable = <span class="keyword">new</span> SudokuGrid()
+    ui.setTable blankTable</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Add an additional class to user-provided cells, so
+we can style them differently.</p>
 
-<p>Note that an invalid grid has positions with no possibilities.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getMostContstrainedPosition: </span><span class="nf">(grid) -&gt;</span>
-    <span class="nv">mostConstrainedPosition = </span><span class="kc">null</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  addUserValuesClass: () -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>the user&#39;s input is the non-empty cells</p>
 
-    <span class="k">for</span> <span class="p">{</span><span class="nv">x: </span><span class="nx">x</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span><span class="p">}</span> <span class="k">in</span> <span class="nx">grid</span><span class="p">.</span><span class="nx">getEmptyPositions</span><span class="p">()</span>
-      <span class="nv">possibilitiesHere = </span><span class="nx">grid</span><span class="p">.</span><span class="nx">getPossibilities</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $(<span class="string">"#sudoku td input[value!='']"</span>).addClass <span class="string">"user_value"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Undoes <code>addUserValuesClass</code>.</p>
 
-      <span class="k">if</span> <span class="nx">possibilitiesHere</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span></pre></div>             </td>           </tr>                               <tr id="section-31">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-31">&#182;</a>               </div>               <p>We will never find a more constrained position, so terminate early.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">return</span> <span class="p">{</span><span class="nv">x: </span><span class="nx">x</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span><span class="p">,</span> <span class="nv">possibilities: </span><span class="p">[]}</span></pre></div>             </td>           </tr>                               <tr id="section-32">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-32">&#182;</a>               </div>               <p>If this position is more constrained, update mostConstrainedPosition.</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">if</span> <span class="o">not</span> <span class="nx">mostConstrainedPosition</span> <span class="o">or</span> <span class="nx">possibilitiesHere</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="nx">mostConstrainedPosition</span><span class="p">.</span><span class="nx">possibilities</span><span class="p">.</span><span class="nx">length</span>
-        <span class="nv">mostConstrainedPosition = </span><span class="p">{</span><span class="nv">x: </span><span class="nx">x</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span><span class="p">,</span> <span class="nv">possibilities: </span><span class="nx">possibilitiesHere</span><span class="p">}</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  removeUserValuesClass: () -&gt;
+    $(<span class="string">".user_value"</span>).removeClass <span class="string">"user_value"</span>
 
-    <span class="nx">mostConstrainedPosition</span></pre></div>             </td>           </tr>                               <tr id="section-33">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-33">&#182;</a>               </div>               <p>Given a sudoku grid, find a soution with a backtracking
+  checkTableIsValid: () -&gt;
+    currentTable = <span class="keyword">new</span> SudokuGrid()
+    currentTable.setFromSelector $(<span class="string">"#sudoku input"</span>)
+
+    <span class="keyword">if</span> <span class="keyword">not</span> currentTable.isValid()
+      $(<span class="string">"#invalid_table"</span>).show()
+    <span class="keyword">else</span>
+      $(<span class="string">"#invalid_table"</span>).hide()
+
+  getTable: () -&gt;
+    grid = <span class="keyword">new</span> SudokuGrid()
+    grid.setFromSelector $(<span class="string">'#sudoku input'</span>)
+
+    grid
+
+  setTable: (table) -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>go over every row</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    $(<span class="string">"#sudoku tr"</span>).each (y, element) -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>then go over ever input in that row</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      $(<span class="string">"input"</span>, $(element)).each (x, element) -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>set this input to the table value at this point</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $(element).val(table.grid[x][y])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <h2>Solver</h2>
+<p>Our solver uses a backtracking cross-off algorithm.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>solver =</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>Given a sudoku grid, find the position with the fewest possibilities.</p>
+<p>Note that an invalid grid has positions with no possibilities.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getMostContstrainedPosition: (grid) -&gt;
+    mostConstrainedPosition = <span class="literal">null</span>
+
+    <span class="keyword">for</span> {x: x, y: y} <span class="keyword">in</span> grid.getEmptyPositions()
+      possibilitiesHere = grid.getPossibilities x, y
+
+      <span class="keyword">if</span> possibilitiesHere.length == <span class="number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>We will never find a more constrained position, so terminate early.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> {x: x, y: y, possibilities: []}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>If this position is more constrained, update mostConstrainedPosition.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> <span class="keyword">not</span> mostConstrainedPosition <span class="keyword">or</span> possibilitiesHere.length &lt; mostConstrainedPosition.possibilities.length
+        mostConstrainedPosition = {x: x, y: y, possibilities: possibilitiesHere}
+
+    mostConstrainedPosition</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Given a sudoku grid, find a soution with a backtracking
 brute-force algorithm, starting with the most constrained
-positions.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">findSolution: </span><span class="nf">(grid) -&gt;</span>
-    <span class="k">if</span> <span class="nx">grid</span><span class="p">.</span><span class="nx">isFull</span><span class="p">()</span>
-      <span class="k">return</span> <span class="p">{</span><span class="nv">isSolution: </span><span class="kc">true</span><span class="p">,</span> <span class="nv">table: </span><span class="nx">grid</span><span class="p">}</span>
+positions.</p>
 
-    <span class="p">{</span><span class="nv">x: </span><span class="nx">x</span><span class="p">,</span> <span class="nv">y: </span><span class="nx">y</span><span class="p">,</span> <span class="nv">possibilities: </span><span class="nx">possibilities</span><span class="p">}</span> <span class="o">=</span> <span class="nx">solver</span><span class="p">.</span><span class="nx">getMostContstrainedPosition</span> <span class="nx">grid</span></pre></div>             </td>           </tr>                               <tr id="section-34">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-34">&#182;</a>               </div>               <p>Try each of the possible values in this empty square until we
-find the correct one.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">for</span> <span class="nx">possibility</span> <span class="k">in</span> <span class="nx">possibilities</span>
-      <span class="nx">grid</span><span class="p">.</span><span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">=</span> <span class="nx">possibility</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  findSolution: (grid) -&gt;
+    <span class="keyword">if</span> grid.isFull()
+      <span class="keyword">return</span> {isSolution: <span class="literal">true</span>, table: grid}
 
-      <span class="nv">result = </span><span class="nx">solver</span><span class="p">.</span><span class="nx">findSolution</span> <span class="nx">grid</span>
-      <span class="k">if</span> <span class="nx">result</span><span class="p">.</span><span class="nx">isSolution</span></pre></div>             </td>           </tr>                               <tr id="section-35">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-35">&#182;</a>               </div>               <p>Found a solution on this branch! hurrah!</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">return</span> <span class="nx">result</span></pre></div>             </td>           </tr>                               <tr id="section-36">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-36">&#182;</a>               </div>               <p>If we get here, this table is now unsolvable since
-there's a position with no possibilities.
-So we reset this square to blank for backtracking.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">grid</span><span class="p">.</span><span class="nx">grid</span><span class="p">[</span><span class="nx">x</span><span class="p">][</span><span class="nx">y</span><span class="p">]</span> <span class="o">=</span> <span class="kc">undefined</span>
+    {x: x, y: y, possibilities: possibilities} = solver.getMostContstrainedPosition grid</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>Try each of the possible values in this empty square until we
+find the correct one.</p>
 
-    <span class="k">return</span> <span class="p">{</span><span class="nv">isSolution: </span><span class="kc">false</span><span class="p">,</span> <span class="nv">table: </span><span class="nx">grid</span><span class="p">}</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">for</span> possibility <span class="keyword">in</span> possibilities
+      grid.grid[x][y] = possibility
 
-<span class="nv">init = </span><span class="nf">() -&gt;</span>
+      result = solver.findSolution grid
+      <span class="keyword">if</span> result.isSolution</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Found a solution on this branch! hurrah!</p>
 
-  <span class="nx">$</span><span class="p">(</span><span class="s">&#39;button#solve&#39;</span><span class="p">).</span><span class="nx">click</span> <span class="o">-&gt;</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">addUserValuesClass</span><span class="p">()</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> result</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>If we get here, this table is now unsolvable since
+there&#39;s a position with no possibilities.
+So we reset this square to blank for backtracking.</p>
 
-    <span class="nv">currentTable = </span><span class="nx">ui</span><span class="p">.</span><span class="nx">getTable</span><span class="p">()</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    grid.grid[x][y] = <span class="literal">undefined</span>
 
-    <span class="nv">startTime = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span>
+    <span class="keyword">return</span> {isSolution: <span class="literal">false</span>, table: grid}
 
-    <span class="nv">result = </span><span class="nx">solver</span><span class="p">.</span><span class="nx">findSolution</span> <span class="nx">currentTable</span>
+init = () -&gt;
 
-    <span class="nv">endTime = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span>
-    <span class="nx">console</span><span class="o">?</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;Solved in </span><span class="si">#{</span><span class="nx">endTime</span> <span class="o">-</span> <span class="nx">startTime</span><span class="si">}</span><span class="s"> milliseconds.&quot;</span>
+  $(<span class="string">'button#solve'</span>).click -&gt;
+    ui.addUserValuesClass()
 
-    <span class="k">if</span> <span class="nx">result</span><span class="p">.</span><span class="nx">isSolution</span>
-      <span class="nv">solvedTable = </span><span class="nx">result</span><span class="p">.</span><span class="nx">table</span>
-      <span class="nx">ui</span><span class="p">.</span><span class="nx">setTable</span> <span class="nx">solvedTable</span>
-    <span class="k">else</span>
-      <span class="nx">ui</span><span class="p">.</span><span class="nx">removeUserValuesClass</span>
+    currentTable = ui.getTable()
 
-  <span class="nx">$</span><span class="p">(</span><span class="s">&#39;button#clear_table&#39;</span><span class="p">).</span><span class="nx">click</span> <span class="o">-&gt;</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">clearTable</span><span class="p">()</span>
+    startTime = <span class="keyword">new</span> Date().getTime()
 
-  <span class="nx">$</span><span class="p">(</span><span class="s">&#39;button#import_puzzle&#39;</span><span class="p">).</span><span class="nx">click</span> <span class="o">-&gt;</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">clearTable</span><span class="p">()</span>
+    result = solver.findSolution currentTable
 
-    <span class="nv">puzzleString = </span><span class="nx">prompt</span><span class="p">(</span><span class="s">&quot;Enter a puzzle string:&quot;</span><span class="p">);</span>
+    endTime = <span class="keyword">new</span> Date().getTime()
+    console?.log <span class="string">"Solved in <span class="subst">#{endTime - startTime}</span> milliseconds."</span>
 
-    <span class="nv">table = </span><span class="k">new</span> <span class="nx">SudokuGrid</span><span class="p">()</span>
-    <span class="nx">table</span><span class="p">.</span><span class="nx">setFromString</span><span class="p">(</span><span class="nx">puzzleString</span><span class="p">)</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">setTable</span><span class="p">(</span><span class="nx">table</span><span class="p">)</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">checkTableIsValid</span><span class="p">()</span>
+    <span class="keyword">if</span> result.isSolution
+      solvedTable = result.table
+      ui.setTable solvedTable
+    <span class="keyword">else</span>
+      ui.removeUserValuesClass
 
-  <span class="nx">$</span><span class="p">(</span><span class="s">&#39;button#export_puzzle&#39;</span><span class="p">).</span><span class="nx">click</span> <span class="o">-&gt;</span>
-    <span class="nx">alert</span> <span class="nx">ui</span><span class="p">.</span><span class="nx">getTable</span><span class="p">().</span><span class="nx">getAsString</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-37">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-37">&#182;</a>               </div>               <p>Monitor table for changes, and warn immediately if the grid is invalid.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">sudoku input&quot;</span><span class="p">).</span><span class="nx">keyup</span> <span class="o">-&gt;</span>
-    <span class="nx">ui</span><span class="p">.</span><span class="nx">checkTableIsValid</span><span class="p">()</span>
+  $(<span class="string">'button#clear_table'</span>).click -&gt;
+    ui.clearTable()
 
-<span class="nx">init</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-38">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-38">&#182;</a>               </div>               <p>We attach our objects to the global object so it's easy to fiddle
-with things in the browser console.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">window</span><span class="p">.</span><span class="nv">ui = </span><span class="nx">ui</span>
-<span class="nb">window</span><span class="p">.</span><span class="nv">solver = </span><span class="nx">solver</span>
-<span class="nb">window</span><span class="p">.</span><span class="nv">SudokuGrid = </span><span class="nx">SudokuGrid</span>
+  $(<span class="string">'button#import_puzzle'</span>).click -&gt;
+    ui.clearTable()
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+    puzzleString = prompt(<span class="string">"Enter a puzzle string:"</span>);
+
+    table = <span class="keyword">new</span> SudokuGrid()
+    table.setFromString(puzzleString)
+    ui.setTable(table)
+    ui.checkTableIsValid()
+
+  $(<span class="string">'button#export_puzzle'</span>).click -&gt;
+    alert ui.getTable().getAsString()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>Monitor table for changes, and warn immediately if the grid is invalid.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  $(<span class="string">"#sudoku input"</span>).keyup -&gt;
+    ui.checkTableIsValid()
+
+init()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>We attach our objects to the global object so it&#39;s easy to fiddle
+with things in the browser console.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>window.ui = ui
+window.solver = solver
+window.SudokuGrid = SudokuGrid</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
