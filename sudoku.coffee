@@ -17,6 +17,10 @@ BOARDSIZE = GROUPWIDTH * GROUPHEIGHT
 # (currently this only used in the frontend)
 BLANK = ""
 
+# A random integer between min and max, inclusive.
+randomInt = (min, max) ->
+  Math.floor(Math.random() * (max - min + 1) + min)
+
 # The Sudoku model. The grid itself is a 2D array, so it can be
 # accessed with `@grid[x][y]`. Previously there were `@get` and `@set`
 # methods, but profiling suggested they were affecting
@@ -280,6 +284,19 @@ init = () ->
       ui.setTable solvedTable
     else
       ui.removeUserValuesClass
+
+  $('#demo').click ->
+    ui.clearTable()
+
+    grid = new SudokuGrid()
+    
+    for i in [1..BOARDSIZE]
+      grid.grid[randomInt(0, BOARDSIZE - 1)][randomInt(0, BOARDSIZE - 1)] = i
+
+    ui.setTable(grid)
+
+    $('#demo').removeClass('info')
+    $('#solve').removeClass('info').addClass('primary')
 
   $('#clear_table').click ->
     ui.clearTable()
