@@ -300,7 +300,7 @@
   };
 
   init = function() {
-    $('button#solve').click(function() {
+    $('#solve').click(function() {
       var currentTable, endTime, result, solvedTable, startTime;
       ui.addUserValuesClass();
       currentTable = ui.getTable();
@@ -317,10 +317,10 @@
         return ui.removeUserValuesClass;
       }
     });
-    $('button#clear_table').click(function() {
+    $('#clear_table').click(function() {
       return ui.clearTable();
     });
-    $('button#import_puzzle').click(function() {
+    $('#import_puzzle').click(function() {
       var puzzleString, table;
       ui.clearTable();
       puzzleString = prompt("Enter a puzzle string:");
@@ -329,7 +329,7 @@
       ui.setTable(table);
       return ui.checkTableIsValid();
     });
-    $('button#export_puzzle').click(function() {
+    $('#export_puzzle').click(function() {
       return alert(ui.getTable().getAsString());
     });
     return $("#sudoku input").keyup(function() {

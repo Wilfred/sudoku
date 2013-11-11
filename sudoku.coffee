@@ -263,7 +263,7 @@ solver =
 
 init = () ->
 
-  $('button#solve').click ->
+  $('#solve').click ->
     ui.addUserValuesClass()
 
     currentTable = ui.getTable()
@@ -281,10 +281,10 @@ init = () ->
     else
       ui.removeUserValuesClass
 
-  $('button#clear_table').click ->
+  $('#clear_table').click ->
     ui.clearTable()
 
-  $('button#import_puzzle').click ->
+  $('#import_puzzle').click ->
     ui.clearTable()
 
     puzzleString = prompt("Enter a puzzle string:");
@@ -294,7 +294,7 @@ init = () ->
     ui.setTable(table)
     ui.checkTableIsValid()
 
-  $('button#export_puzzle').click ->
+  $('#export_puzzle').click ->
     alert ui.getTable().getAsString()
 
   # Monitor table for changes, and warn immediately if the grid is invalid.
