@@ -17,6 +17,10 @@ BOARDSIZE = GROUPWIDTH * GROUPHEIGHT
 # (currently this only used in the frontend)
 BLANK = ""
 
+# A random integer between min and max, inclusive.
+randomInt = (min, max) ->
+  Math.floor(Math.random() * (max - min + 1) + min)
+
 # The Sudoku model. The grid itself is a 2D array, so it can be
 # accessed with `@grid[x][y]`. Previously there were `@get` and `@set`
 # methods, but profiling suggested they were affecting
@@ -263,7 +267,7 @@ solver =
 
 init = () ->
 
-  $('button#solve').click ->
+  $('#solve').click ->
     ui.addUserValuesClass()
 
     currentTable = ui.getTable()
@@ -281,20 +285,33 @@ init = () ->
     else
       ui.removeUserValuesClass
 
-  $('button#clear_table').click ->
+  $('#demo').click ->
     ui.clearTable()
 
-  $('button#import_puzzle').click ->
+    grid = new SudokuGrid()
+    
+    for i in [1..BOARDSIZE]
+      grid.grid[randomInt(0, BOARDSIZE - 1)][randomInt(0, BOARDSIZE - 1)] = i
+
+    ui.setTable(grid)
+
+    $('#demo').removeClass('info')
+    $('#solve').removeClass('info').addClass('primary')
+
+  $('#clear_table').click ->
     ui.clearTable()
 
-    puzzleString = prompt("Enter a puzzle string:");
+  $('#import_puzzle').click ->
+    ui.clearTable()
+
+    puzzleString = prompt("Enter a puzzle string:")
 
     table = new SudokuGrid()
     table.setFromString(puzzleString)
     ui.setTable(table)
     ui.checkTableIsValid()
 
-  $('button#export_puzzle').click ->
+  $('#export_puzzle').click ->
     alert ui.getTable().getAsString()
 
   # Monitor table for changes, and warn immediately if the grid is invalid.
