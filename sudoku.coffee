@@ -287,7 +287,7 @@ init = () ->
   $('#import_puzzle').click ->
     ui.clearTable()
 
-    puzzleString = prompt("Enter a puzzle string:");
+    puzzleString = prompt("Enter a puzzle string:")
 
     table = new SudokuGrid()
     table.setFromString(puzzleString)
