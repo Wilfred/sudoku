@@ -19,11 +19,16 @@ body {
 
 table#sudoku {
 	border: 3px #888 solid;
+	border-right: 4px #888 solid;
 	width: inherit;
 }
 
 #sudoku #row-3, #sudoku #row-6 {
 	border-top: 3px #888 solid;
+}
+
+#sudoku td {
+	border-left: 1px #888 solid;
 }
 
 #sudoku #cell-3, #sudoku #cell-6, #sudoku #cell-12, #sudoku #cell-15,
@@ -36,6 +41,10 @@ table#sudoku {
 
 
 #sudoku input[type=text] {
+	border: 0;
+	border-radius: 0 0 0 0;
+	box-shadow: none;
+        
 	padding: 0;
 	width: 45px;
 	height: 45px;
