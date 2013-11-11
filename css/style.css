@@ -6,11 +6,13 @@ body {
     margin-bottom: 20px;
 }
 .btn-group button {
+    width: 70px;
+    display: block;
     margin-bottom: 5px;
 }
 
 .btn {
-    width: 120px;
+    font-size: 15px;
 }
 
 #invalid_table {
@@ -61,4 +63,9 @@ table#sudoku {
 
 #sudoku td input.user_value {
     color: #3333AA;
+}
+
+#ui {
+    float: left;
+    padding-right: 10px;
 }
