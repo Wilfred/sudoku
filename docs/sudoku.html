@@ -18,10 +18,10 @@
         <li id="section-1">
             <div class="annotation">
               
-              <div class="pilwrap for-h1">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1>Sudoku Solver</h1>
+              <h1 id="sudoku-solver">Sudoku Solver</h1>
 <p>A sudoku solver that solves abitrary size grids using a simple
 backtracking algorithm.</p>
 <p>Grid dimensions. The solver itself can handle a grid of any size,
@@ -84,7 +84,7 @@ heuristics are added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  constructor: () -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">constructor</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     <span class="property">@grid</span> = <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
       <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
         <span class="literal">undefined</span>
@@ -104,8 +104,8 @@ heuristics are added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setFromSelector: (selector) -&gt;
-    selector.each (index, element) =&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">setFromSelector</span>: <span class="function"><span class="params">(selector)</span> -&gt;</span>
+    selector.each <span class="function"><span class="params">(index, element)</span> =&gt;</span>
       x = index % BOARDSIZE
       y = Math.floor(index / BOARDSIZE)
 
@@ -127,7 +127,7 @@ heuristics are added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setFromString: (string) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">setFromString</span>: <span class="function"><span class="params">(string)</span> -&gt;</span>
     <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..string.length]
       value = parseInt(string.charAt i, <span class="number">10</span>)</pre></div></div>
             
@@ -162,7 +162,7 @@ heuristics are added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getAsString: () -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getAsString</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     string = <span class="string">""</span>
     <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
       <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
@@ -170,7 +170,7 @@ heuristics are added.</p>
 
     string
 
-  clear: () -&gt;
+  <span class="attribute">clear</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
       <span class="keyword">for</span> j <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
         <span class="property">@grid</span>[i][j] = <span class="literal">undefined</span></pre></div></div>
@@ -188,7 +188,7 @@ heuristics are added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getRow: (y) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getRow</span>: <span class="function"><span class="params">(y)</span> -&gt;</span>
     <span class="keyword">for</span> i <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
       <span class="property">@grid</span>[i][y]</pre></div></div>
             
@@ -205,7 +205,7 @@ heuristics are added.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getColumn: (x) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getColumn</span>: <span class="function"><span class="params">(x)</span> -&gt;</span>
     <span class="property">@grid</span>[x]</pre></div></div>
             
         </li>
@@ -222,7 +222,7 @@ returning a 1-D array.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getGroup: (x, y) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getGroup</span>: <span class="function"><span class="params">(x, y)</span> -&gt;</span>
     group = []
     <span class="keyword">for</span> i <span class="keyword">in</span> [x * GROUPWIDTH...(x+<span class="number">1</span>) * GROUPWIDTH]
       <span class="keyword">for</span> j <span class="keyword">in</span> [y * GROUPHEIGHT...(y+<span class="number">1</span>) * GROUPHEIGHT]
@@ -245,7 +245,7 @@ more attractive results when &#39;solving&#39; an empty grid.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getEmptyPositions: () -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getEmptyPositions</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     emptyPositions = []
 
     <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
@@ -268,7 +268,7 @@ more attractive results when &#39;solving&#39; an empty grid.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  isFull: () -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">isFull</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     <span class="keyword">for</span> x <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
       <span class="keyword">for</span> y <span class="keyword">in</span> [<span class="number">0.</span>..BOARDSIZE]
         <span class="keyword">if</span> <span class="property">@grid</span>[x][y] == <span class="literal">undefined</span>
@@ -290,7 +290,7 @@ on neighbours.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getPossibilities: (x, y) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getPossibilities</span>: <span class="function"><span class="params">(x, y)</span> -&gt;</span>
     possibilities = []
 
     <span class="keyword">for</span> value <span class="keyword">in</span> <span class="property">@legalValues</span>
@@ -318,7 +318,7 @@ on neighbours.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  isRegionValid: (region) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">isRegionValid</span>: <span class="function"><span class="params">(region)</span> -&gt;</span>
     seenSoFar = {}
 
     <span class="keyword">for</span> value <span class="keyword">in</span> region
@@ -349,7 +349,7 @@ return true here.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  isValid: () -&gt;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">isValid</span>: <span class="function"><span class="params">()</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -415,10 +415,10 @@ return true here.</p>
         <li id="section-20">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <h2>UI utilities</h2>
+              <h2 id="ui-utilities">UI utilities</h2>
 
             </div>
             
@@ -437,7 +437,7 @@ return true here.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  clearTable: () -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">clearTable</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     ui.removeUserValuesClass()
     $(<span class="string">"#invalid_table"</span>).hide()
 
@@ -458,7 +458,7 @@ we can style them differently.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  addUserValuesClass: () -&gt;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">addUserValuesClass</span>: <span class="function"><span class="params">()</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -488,10 +488,10 @@ we can style them differently.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  removeUserValuesClass: () -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">removeUserValuesClass</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     $(<span class="string">".user_value"</span>).removeClass <span class="string">"user_value"</span>
 
-  checkTableIsValid: () -&gt;
+  <span class="attribute">checkTableIsValid</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     currentTable = <span class="keyword">new</span> SudokuGrid()
     currentTable.setFromSelector $(<span class="string">"#sudoku input"</span>)
 
@@ -500,13 +500,13 @@ we can style them differently.</p>
     <span class="keyword">else</span>
       $(<span class="string">"#invalid_table"</span>).hide()
 
-  getTable: () -&gt;
+  <span class="attribute">getTable</span>: <span class="function"><span class="params">()</span> -&gt;</span>
     grid = <span class="keyword">new</span> SudokuGrid()
     grid.setFromSelector $(<span class="string">'#sudoku input'</span>)
 
     grid
 
-  setTable: (table) -&gt;</pre></div></div>
+  <span class="attribute">setTable</span>: <span class="function"><span class="params">(table)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -521,7 +521,7 @@ we can style them differently.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    $(<span class="string">"#sudoku tr"</span>).each (y, element) -&gt;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    $<span class="function"><span class="params">(<span class="string">"#sudoku tr"</span>)</span>.<span class="title">each</span> <span class="params">(y, element)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -536,7 +536,7 @@ we can style them differently.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      $(<span class="string">"input"</span>, $(element)).each (x, element) -&gt;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      $<span class="function"><span class="params">(<span class="string">"input"</span>, $(element))</span>.<span class="title">each</span> <span class="params">(x, element)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -559,10 +559,10 @@ we can style them differently.</p>
         <li id="section-28">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
-              <h2>Solver</h2>
+              <h2 id="solver">Solver</h2>
 <p>Our solver uses a backtracking cross-off algorithm.</p>
 
             </div>
@@ -583,10 +583,10 @@ we can style them differently.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getMostContstrainedPosition: (grid) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">getMostContstrainedPosition</span>: <span class="function"><span class="params">(grid)</span> -&gt;</span>
     mostConstrainedPosition = <span class="literal">null</span>
 
-    <span class="keyword">for</span> {x: x, y: y} <span class="keyword">in</span> grid.getEmptyPositions()
+    <span class="keyword">for</span> {<span class="attribute">x</span>: x, <span class="attribute">y</span>: y} <span class="keyword">in</span> grid.getEmptyPositions()
       possibilitiesHere = grid.getPossibilities x, y
 
       <span class="keyword">if</span> possibilitiesHere.length == <span class="number">0</span></pre></div></div>
@@ -604,7 +604,7 @@ we can style them differently.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> {x: x, y: y, possibilities: []}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> {<span class="attribute">x</span>: x, <span class="attribute">y</span>: y, <span class="attribute">possibilities</span>: []}</pre></div></div>
             
         </li>
         
@@ -620,7 +620,7 @@ we can style them differently.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> <span class="keyword">not</span> mostConstrainedPosition <span class="keyword">or</span> possibilitiesHere.length &lt; mostConstrainedPosition.possibilities.length
-        mostConstrainedPosition = {x: x, y: y, possibilities: possibilitiesHere}
+        mostConstrainedPosition = {<span class="attribute">x</span>: x, <span class="attribute">y</span>: y, <span class="attribute">possibilities</span>: possibilitiesHere}
 
     mostConstrainedPosition</pre></div></div>
             
@@ -639,11 +639,11 @@ positions.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  findSolution: (grid) -&gt;
+            <div class="content"><div class='highlight'><pre>  <span class="attribute">findSolution</span>: <span class="function"><span class="params">(grid)</span> -&gt;</span>
     <span class="keyword">if</span> grid.isFull()
-      <span class="keyword">return</span> {isSolution: <span class="literal">true</span>, table: grid}
+      <span class="keyword">return</span> {<span class="attribute">isSolution</span>: <span class="literal">true</span>, <span class="attribute">table</span>: grid}
 
-    {x: x, y: y, possibilities: possibilities} = solver.getMostContstrainedPosition grid</pre></div></div>
+    {<span class="attribute">x</span>: x, <span class="attribute">y</span>: y, <span class="attribute">possibilities</span>: possibilities} = solver.getMostContstrainedPosition grid</pre></div></div>
             
         </li>
         
@@ -697,11 +697,11 @@ So we reset this square to blank for backtracking.</p>
             
             <div class="content"><div class='highlight'><pre>    grid.grid[x][y] = <span class="literal">undefined</span>
 
-    <span class="keyword">return</span> {isSolution: <span class="literal">false</span>, table: grid}
+    <span class="keyword">return</span> {<span class="attribute">isSolution</span>: <span class="literal">false</span>, <span class="attribute">table</span>: grid}
 
-init = () -&gt;
+<span class="function"><span class="title">init</span> = <span class="params">()</span> -&gt;</span>
 
-  $(<span class="string">'button#solve'</span>).click -&gt;
+  $(<span class="string">'button#solve'</span>).click<span class="function"> -&gt;</span>
     ui.addUserValuesClass()
 
     currentTable = ui.getTable()
@@ -711,7 +711,7 @@ init = () -&gt;
     result = solver.findSolution currentTable
 
     endTime = <span class="keyword">new</span> Date().getTime()
-    console?.log <span class="string">"Solved in <span class="subst">#{endTime - startTime}</span> milliseconds."</span>
+    <span class="built_in">console</span>?.log <span class="string">"Solved in <span class="subst">#{endTime - startTime}</span> milliseconds."</span>
 
     <span class="keyword">if</span> result.isSolution
       solvedTable = result.table
@@ -719,10 +719,10 @@ init = () -&gt;
     <span class="keyword">else</span>
       ui.removeUserValuesClass
 
-  $(<span class="string">'button#clear_table'</span>).click -&gt;
+  $(<span class="string">'button#clear_table'</span>).click<span class="function"> -&gt;</span>
     ui.clearTable()
 
-  $(<span class="string">'button#import_puzzle'</span>).click -&gt;
+  $(<span class="string">'button#import_puzzle'</span>).click<span class="function"> -&gt;</span>
     ui.clearTable()
 
     puzzleString = prompt(<span class="string">"Enter a puzzle string:"</span>);
@@ -732,7 +732,7 @@ init = () -&gt;
     ui.setTable(table)
     ui.checkTableIsValid()
 
-  $(<span class="string">'button#export_puzzle'</span>).click -&gt;
+  $(<span class="string">'button#export_puzzle'</span>).click<span class="function"> -&gt;</span>
     alert ui.getTable().getAsString()</pre></div></div>
             
         </li>
@@ -748,7 +748,7 @@ init = () -&gt;
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  $(<span class="string">"#sudoku input"</span>).keyup -&gt;
+            <div class="content"><div class='highlight'><pre>  $(<span class="string">"#sudoku input"</span>).keyup<span class="function"> -&gt;</span>
     ui.checkTableIsValid()
 
 init()</pre></div></div>
